@@ -1,0 +1,167 @@
+[
+  {
+    "fact_code": "F-01",
+    "content": "ApexCloud architecture provides up to 99.99% availability backed by our standard Enterprise SLA.",
+    "owner_name": "Marcus Vance",
+    "owner_email": "marcus.vance@apexcloud.io",
+    "source_document": "Enterprise_SLA_Agreement_v4.pdf",
+    "valid_until": "2027-12-31",
+    "is_expired": false,
+    "status": "active",
+    "tags": ["sla", "availability", "uptime"]
+  },
+  {
+    "fact_code": "F-02",
+    "content": "ApexCloud control plane processes telemetry and query requests in under 5 milliseconds at p99.",
+    "owner_name": "Sarah Lin",
+    "owner_email": "sarah.lin@apexcloud.io",
+    "source_document": "Performance_Benchmark_Report_Q1_2026.pdf",
+    "valid_until": "2027-06-30",
+    "is_expired": false,
+    "status": "active",
+    "tags": ["latency", "performance", "p99"]
+  },
+  {
+    "fact_code": "F-03",
+    "content": "ApexCloud is SOC 2 Type II certified and ISO/IEC 27001 compliant across all active global regions.",
+    "owner_name": "Elena Rostova",
+    "owner_email": "elena.rostova@apexcloud.io",
+    "source_document": "SOC2_Type_II_Compliance_Audit_2026.pdf",
+    "valid_until": "2027-03-31",
+    "is_expired": false,
+    "status": "active",
+    "tags": ["security", "soc2", "compliance", "iso27001"]
+  },
+  {
+    "fact_code": "F-04",
+    "content": "ApexCloud HIPAA Business Associate Agreements (BAA) are available for all Healthcare tier deployments.",
+    "owner_name": "Elena Rostova",
+    "owner_email": "elena.rostova@apexcloud.io",
+    "source_document": "Healthcare_Compliance_Addendum_2026.pdf",
+    "valid_until": "2027-12-31",
+    "is_expired": false,
+    "status": "active",
+    "tags": ["hipaa", "compliance", "healthcare"]
+  },
+  {
+    "fact_code": "F-05",
+    "content": "ApexCloud supports automated live scaling across up to 50,000 concurrent Kubernetes worker nodes.",
+    "owner_name": "David Kalu",
+    "owner_email": "david.kalu@apexcloud.io",
+    "source_document": "Infrastructure_Limits_Whitepaper_2026.pdf",
+    "valid_until": "2027-09-30",
+    "is_expired": false,
+    "status": "active",
+    "tags": ["kubernetes", "scaling", "capacity"]
+  },
+  {
+    "fact_code": "F-06",
+    "content": "ApexCloud encrypts customer data at rest using AES-256 and in transit using TLS 1.3 with automated certificate rotation.",
+    "owner_name": "Elena Rostova",
+    "owner_email": "elena.rostova@apexcloud.io",
+    "source_document": "Encryption_Standards_Spec_v3.pdf",
+    "valid_until": "2027-12-31",
+    "is_expired": false,
+    "status": "active",
+    "tags": ["security", "encryption", "tls"]
+  },
+  {
+    "fact_code": "F-07",
+    "content": "ApexCloud reduces end-of-month reporting compute time by up to 45% based on enterprise customer telemetry audits.",
+    "owner_name": "Ananya Sharma",
+    "owner_email": "ananya.sharma@apexcloud.io",
+    "source_document": "Customer_Efficiency_Audit_2025.pdf",
+    "valid_until": "2026-06-30",
+    "is_expired": true,
+    "status": "expired",
+    "tags": ["performance", "efficiency", "reporting"]
+  },
+  {
+    "fact_code": "F-08",
+    "content": "ApexCloud reduces AWS and GCP cloud egress transfer costs by up to 30% via intelligent edge caching.",
+    "owner_name": "David Kalu",
+    "owner_email": "david.kalu@apexcloud.io",
+    "source_document": "Cloud_Egress_Optimization_Study_2025.pdf",
+    "valid_until": "2026-05-15",
+    "is_expired": true,
+    "status": "expired",
+    "tags": ["costs", "cloud", "aws", "gcp"]
+  },
+  {
+    "fact_code": "F-09",
+    "content": "ApexCloud was named a Leader in the 2025 Enterprise Cloud Observability Wave by Forrester Research.",
+    "owner_name": "Marcus Vance",
+    "owner_email": "marcus.vance@apexcloud.io",
+    "source_document": "Forrester_Wave_Report_Q3_2025.pdf",
+    "valid_until": "2026-09-30",
+    "is_expired": true,
+    "status": "expired",
+    "tags": ["ranking", "analyst", "forrester", "award"]
+  },
+  {
+    "fact_code": "F-10",
+    "content": "ApexCloud offers pre-built zero-code connectors for Snowflake, Databricks, PostgreSQL, and Kafka.",
+    "owner_name": "Sarah Lin",
+    "owner_email": "sarah.lin@apexcloud.io",
+    "source_document": "Ecosystem_Integration_Directory_2026.pdf",
+    "valid_until": "2027-12-31",
+    "is_expired": false,
+    "status": "active",
+    "tags": ["integrations", "snowflake", "kafka", "postgres"]
+  },
+  {
+    "fact_code": "F-11",
+    "content": "ApexCloud operates dedicated data sovereign regions in Frankfurt, Singapore, Mumbai, and Virginia.",
+    "owner_name": "Marcus Vance",
+    "owner_email": "marcus.vance@apexcloud.io",
+    "source_document": "Global_Data_Center_Topology_2026.pdf",
+    "valid_until": "2027-12-31",
+    "is_expired": false,
+    "status": "active",
+    "tags": ["regions", "gdpr", "sovereignty"]
+  },
+  {
+    "fact_code": "F-12",
+    "content": "Standard ApexCloud queries execute and return results in under 5 seconds across 10TB datasets.",
+    "owner_name": "Sarah Lin",
+    "owner_email": "sarah.lin@apexcloud.io",
+    "source_document": "BigData_Query_Engine_Evaluation_2026.pdf",
+    "valid_until": "2027-08-31",
+    "is_expired": false,
+    "status": "active",
+    "tags": ["query", "speed", "latency", "bigdata"]
+  },
+  {
+    "fact_code": "F-13",
+    "content": "ApexCloud Developer Sandbox tier provides 100 free GB of monthly log ingestion with no credit card required.",
+    "owner_name": "Ananya Sharma",
+    "owner_email": "ananya.sharma@apexcloud.io",
+    "source_document": "Pricing_and_Tiers_Policy_2026.pdf",
+    "valid_until": "2027-12-31",
+    "is_expired": false,
+    "status": "active",
+    "tags": ["pricing", "free_tier", "sandbox"]
+  },
+  {
+    "fact_code": "F-14",
+    "content": "ApexCloud automated backup restores complete with a Recovery Point Objective (RPO) of under 1 minute.",
+    "owner_name": "David Kalu",
+    "owner_email": "david.kalu@apexcloud.io",
+    "source_document": "Disaster_Recovery_Architecture_Guide_2026.pdf",
+    "valid_until": "2027-11-30",
+    "is_expired": false,
+    "status": "active",
+    "tags": ["backup", "rpo", "disaster_recovery"]
+  },
+  {
+    "fact_code": "F-15",
+    "content": "More than 450 enterprise organizations run mission-critical workloads on ApexCloud as of Q1 2026.",
+    "owner_name": "Marcus Vance",
+    "owner_email": "marcus.vance@apexcloud.io",
+    "source_document": "Quarterly_Customer_Count_Verification_Q1_2026.pdf",
+    "valid_until": "2026-12-31",
+    "is_expired": false,
+    "status": "active",
+    "tags": ["customers", "scale", "stats"]
+  }
+]

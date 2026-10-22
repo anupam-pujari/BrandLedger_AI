@@ -1,0 +1,295 @@
+[
+  {
+    "id": "draft_01",
+    "name": "Outdated Efficiency Claim",
+    "content_type": "text",
+    "title": "Quarterly Performance Update Email",
+    "body": "ApexCloud reduces your team's end-of-month reporting time by 60%. Upgrade your cluster today to accelerate data queries.",
+    "intent_lock": {
+      "purpose": "Encourage enterprise customers to upgrade their compute clusters",
+      "target_audience": "VP of Engineering and Data Platform Leads",
+      "key_message": "ApexCloud saves significant compute time on monthly financial reports"
+    },
+    "expected_findings": [
+      {
+        "category": "claims",
+        "check_type": "ai_assisted",
+        "severity": "critical",
+        "flagged_text": "reduces your team's end-of-month reporting time by 60%",
+        "proof_fact_code": "F-07",
+        "claim_status": "outdated",
+        "expected_issue": "Fact F-07 supports only up to 45% and expired on 2026-06-30."
+      }
+    ]
+  },
+  {
+    "id": "draft_02",
+    "name": "Unsubstantiated Ranking Boast",
+    "content_type": "social_post",
+    "title": "LinkedIn Product Launch Post",
+    "body": "Proud to announce that ApexCloud is now officially the fastest and #1 cloud telemetry platform in the world! Nothing else comes close.",
+    "intent_lock": {
+      "purpose": "Social announcement celebrating query engine release",
+      "target_audience": "Cloud architects and DevOps community",
+      "key_message": "ApexCloud offers high telemetry processing speed"
+    },
+    "expected_findings": [
+      {
+        "category": "claims",
+        "check_type": "ai_assisted",
+        "severity": "critical",
+        "flagged_text": "the fastest and #1 cloud telemetry platform in the world",
+        "proof_rule_code": "R-30",
+        "claim_status": "unsupported",
+        "expected_issue": "Unsubstantiated ranking claims violate Rule R-30 without third-party audit proof."
+      },
+      {
+        "category": "tone",
+        "check_type": "ai_assisted",
+        "severity": "warning",
+        "flagged_text": "Nothing else comes close",
+        "proof_rule_code": "R-02",
+        "expected_issue": "Excessive sales hyperbole violates Rule R-02."
+      }
+    ]
+  },
+  {
+    "id": "draft_03",
+    "name": "Absolute Guarantee Violation",
+    "content_type": "text",
+    "title": "Landing Page Hero Section",
+    "body": "Migrate your database with ApexCloud. We guarantee 100% uptime with zero risk and zero downtime ever.",
+    "intent_lock": {
+      "purpose": "Convert website visitors to start a migration evaluation",
+      "target_audience": "CTOs and IT Infrastructure Directors",
+      "key_message": "Reliable database migrations with minimal disruption"
+    },
+    "expected_findings": [
+      {
+        "category": "terminology",
+        "check_type": "rule_check",
+        "severity": "critical",
+        "flagged_text": "guarantee 100% uptime",
+        "proof_rule_code": "R-21",
+        "suggested_fix": "designed to provide up to 99.99% availability backed by our enterprise SLA",
+        "expected_issue": "Absolute guarantees are prohibited in promotional copy by Rule R-21."
+      }
+    ]
+  },
+  {
+    "id": "draft_04",
+    "name": "Aggressive Tone and Disparaging Competitor",
+    "content_type": "email",
+    "title": "Sales Outbound Sequence",
+    "body": "Still using LegacyDatastore? That clunky garbage software is a mind-blowing disaster for modern engineering teams.",
+    "intent_lock": {
+      "purpose": "Win back accounts migrating from legacy systems",
+      "target_audience": "Engineering managers",
+      "key_message": "ApexCloud modernizes infrastructure compared to legacy systems"
+    },
+    "expected_findings": [
+      {
+        "category": "tone",
+        "check_type": "ai_assisted",
+        "severity": "critical",
+        "flagged_text": "clunky garbage software",
+        "proof_rule_code": "R-03",
+        "expected_issue": "Directly disparaging competitors violates respectful competitive stance Rule R-03."
+      },
+      {
+        "category": "tone",
+        "check_type": "ai_assisted",
+        "severity": "warning",
+        "flagged_text": "mind-blowing disaster",
+        "proof_rule_code": "R-02",
+        "expected_issue": "Overly emotional slang and hyperbole violate Rule R-02."
+      }
+    ]
+  },
+  {
+    "id": "draft_05",
+    "name": "Brand Capitalization and Banned Term",
+    "content_type": "text",
+    "title": "Technical Blog Header",
+    "body": "Getting started with Apex Cloud: How our clients can whitelist IP addresses in under 5 minutes.",
+    "intent_lock": {
+      "purpose": "Educate engineers on network configuration",
+      "target_audience": "Systems administrators",
+      "key_message": "Fast network allowlist configuration in ApexCloud"
+    },
+    "expected_findings": [
+      {
+        "category": "terminology",
+        "check_type": "rule_check",
+        "severity": "warning",
+        "flagged_text": "Apex Cloud",
+        "proof_rule_code": "R-22",
+        "suggested_fix": "ApexCloud",
+        "expected_issue": "Product name must be CamelCase without spaces."
+      },
+      {
+        "category": "terminology",
+        "check_type": "rule_check",
+        "severity": "info",
+        "flagged_text": "clients",
+        "proof_rule_code": "R-10",
+        "suggested_fix": "customers",
+        "expected_issue": "Use 'customers' instead of 'clients'."
+      },
+      {
+        "category": "terminology",
+        "check_type": "rule_check",
+        "severity": "warning",
+        "flagged_text": "whitelist",
+        "proof_rule_code": "R-10",
+        "suggested_fix": "allowlist",
+        "expected_issue": "Use inclusive terminology 'allowlist'."
+      }
+    ]
+  },
+  {
+    "id": "draft_06",
+    "name": "Missing Required Email Disclaimer",
+    "content_type": "email",
+    "title": "Promotional Webinar Invitation",
+    "body": "Join our upcoming live architecture session to see how ApexCloud automates multi-region failover. Reserve your seat today!",
+    "intent_lock": {
+      "purpose": "Drive registrations for webinar",
+      "target_audience": "DevOps Engineers",
+      "key_message": "Learn about automated multi-region failover"
+    },
+    "expected_findings": [
+      {
+        "category": "messaging",
+        "check_type": "rule_check",
+        "severity": "critical",
+        "flagged_text": null,
+        "proof_rule_code": "R-40",
+        "expected_issue": "Promotional email lacks mandatory opt-out disclaimer snippet."
+      }
+    ]
+  },
+  {
+    "id": "draft_07",
+    "name": "Vague Link Text & Readability Complexity",
+    "content_type": "text",
+    "title": "Customer Advisory Note",
+    "body": "The epistemological underpinnings of our asynchronous transactional engine necessitate non-deterministic synchronization across clusters. To read our latest benchmark findings, click here.",
+    "intent_lock": {
+      "purpose": "Inform technical architects about asynchronous syncing updates",
+      "target_audience": "Principal Architects",
+      "key_message": "Understand how asynchronous replication operates"
+    },
+    "expected_findings": [
+      {
+        "category": "accessibility",
+        "check_type": "rule_check",
+        "severity": "warning",
+        "flagged_text": "click here",
+        "proof_rule_code": "R-62",
+        "suggested_fix": "Download the 2026 Benchmark Report",
+        "expected_issue": "Vague link text 'click here' violates Rule R-62."
+      },
+      {
+        "category": "accessibility",
+        "check_type": "rule_check",
+        "severity": "info",
+        "flagged_text": null,
+        "proof_rule_code": "R-63",
+        "expected_issue": "Readability grade level exceeds maximum threshold."
+      }
+    ]
+  },
+  {
+    "id": "draft_08",
+    "name": "Visual Card Contrast and Alt Text Failure",
+    "content_type": "image",
+    "title": "Social Card Banner Graphic",
+    "body": "ApexCloud High Throughput Engine",
+    "image_metadata": {
+      "filename": "social_card_q1.png",
+      "dimensions": [1200, 630],
+      "dominant_colors": ["#9CA3AF", "#FFFFFF"],
+      "has_alt_text": false,
+      "text_contrast_ratio": 2.1
+    },
+    "intent_lock": {
+      "purpose": "LinkedIn social banner display",
+      "target_audience": "General public",
+      "key_message": "Highlight high throughput capabilities"
+    },
+    "expected_findings": [
+      {
+        "category": "accessibility",
+        "check_type": "rule_check",
+        "severity": "critical",
+        "flagged_text": "Text contrast ratio: 2.1:1",
+        "proof_rule_code": "R-60",
+        "expected_issue": "Contrast ratio 2.1:1 fails WCAG 2.1 AA minimum 4.5:1 standard."
+      },
+      {
+        "category": "accessibility",
+        "check_type": "rule_check",
+        "severity": "warning",
+        "flagged_text": "Missing alt text",
+        "proof_rule_code": "R-61",
+        "expected_issue": "Image lacks descriptive alternative text for accessibility."
+      }
+    ]
+  },
+  {
+    "id": "draft_09",
+    "name": "Off-Brand Color Palette Violation",
+    "content_type": "image",
+    "title": "Promotional Feature Graphic",
+    "body": "Zero Downtime Deployments",
+    "image_metadata": {
+      "filename": "promo_feature.png",
+      "dimensions": [1200, 630],
+      "dominant_colors": ["#39FF14", "#0F172A"],
+      "has_alt_text": true,
+      "text_contrast_ratio": 8.5
+    },
+    "intent_lock": {
+      "purpose": "Twitter promotional image",
+      "target_audience": "Developers",
+      "key_message": "Zero downtime deployments"
+    },
+    "expected_findings": [
+      {
+        "category": "visual",
+        "check_type": "rule_check",
+        "severity": "warning",
+        "flagged_text": "#39FF14",
+        "proof_rule_code": "R-50",
+        "expected_issue": "Color #39FF14 is an unapproved neon tone not in the brand palette."
+      }
+    ]
+  },
+  {
+    "id": "draft_10",
+    "name": "100% Compliant Clean Social Post",
+    "content_type": "social_post",
+    "title": "Q1 Scalability Milestone Announcement",
+    "body": "More than 450 enterprise organizations run mission-critical workloads on ApexCloud. Our architecture is designed to provide up to 99.99% availability backed by our enterprise SLA. Start your 14-day technical sandbox evaluation: apexcloud.io/sandbox.",
+    "intent_lock": {
+      "purpose": "Celebrate enterprise milestone and drive sandbox trials",
+      "target_audience": "Enterprise technology decision makers",
+      "key_message": "ApexCloud is trusted by 450+ enterprises with 99.99% availability SLA"
+    },
+    "expected_findings": []
+  },
+  {
+    "id": "draft_11",
+    "name": "100% Compliant Clean Customer Email",
+    "content_type": "email",
+    "title": "Security and Compliance Advisory",
+    "body": "Dear customer, we are pleased to confirm that ApexCloud is SOC 2 Type II certified and ISO/IEC 27001 compliant across all active global regions. Customer data is encrypted at rest using AES-256 and in transit using TLS 1.3 with automated certificate rotation. You are receiving this notice as an ApexCloud subscriber. Unsubscribe: apexcloud.io/opt-out.",
+    "intent_lock": {
+      "purpose": "Provide annual security compliance assurance to customers",
+      "target_audience": "Compliance officers and Security architects",
+      "key_message": "ApexCloud maintains verified SOC 2 and ISO 27001 compliance with AES-256 encryption"
+    },
+    "expected_findings": []
+  }
+]

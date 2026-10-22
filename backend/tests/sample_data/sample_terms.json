@@ -1,0 +1,74 @@
+[
+  {
+    "preferred_term": "customer",
+    "banned_alternatives": ["client", "end-user", "consumer", "purchaser"],
+    "notes": "Always refer to organizations and people using ApexCloud as customers or engineers.",
+    "case_sensitive": false
+  },
+  {
+    "preferred_term": "ApexCloud",
+    "banned_alternatives": ["Apex Cloud", "apexcloud", "APEXCLOUD", "Apex-Cloud"],
+    "notes": "Product brand name must always be CamelCase with no space.",
+    "case_sensitive": true
+  },
+  {
+    "preferred_term": "designed to provide",
+    "banned_alternatives": ["guarantee", "guaranteed", "100% guaranteed", "promises 100%"],
+    "notes": "Promotional copy must not offer absolute guarantees without an enterprise SLA reference.",
+    "case_sensitive": false
+  },
+  {
+    "preferred_term": "on-premises",
+    "banned_alternatives": ["on-premise", "on prem", "on premise"],
+    "notes": "The correct grammatical noun/adjective is 'on-premises' (with the 's').",
+    "case_sensitive": false
+  },
+  {
+    "preferred_term": "allowlist",
+    "banned_alternatives": ["whitelist", "white-list"],
+    "notes": "Inclusive technical terminology standard across all technical docs and UI.",
+    "case_sensitive": false
+  },
+  {
+    "preferred_term": "blocklist",
+    "banned_alternatives": ["blacklist", "black-list"],
+    "notes": "Inclusive technical terminology standard across all technical docs and UI.",
+    "case_sensitive": false
+  },
+  {
+    "preferred_term": "primary / secondary",
+    "banned_alternatives": ["master / slave", "master-slave"],
+    "notes": "Inclusive architecture naming convention for distributed nodes and replicas.",
+    "case_sensitive": false
+  },
+  {
+    "preferred_term": "knowledge base",
+    "banned_alternatives": ["KB", "kb", "knowledgebase"],
+    "notes": "Spell out as two words in all customer-facing help copy.",
+    "case_sensitive": false
+  },
+  {
+    "preferred_term": "open source",
+    "banned_alternatives": ["open-source software", "free software"],
+    "notes": "Use 'open source' without a hyphen when used as a noun, hyphenate only as compound modifier before noun.",
+    "case_sensitive": false
+  },
+  {
+    "preferred_term": "sign in",
+    "banned_alternatives": ["login", "log in", "log-in", "sign on"],
+    "notes": "Use 'sign in' as a verb phrase for user authentication; 'login' is used only as a noun modifier (e.g. login screen).",
+    "case_sensitive": false
+  },
+  {
+    "preferred_term": "multi-region",
+    "banned_alternatives": ["multiregion", "multi region"],
+    "notes": "Always hyphenate cloud region designations.",
+    "case_sensitive": false
+  },
+  {
+    "preferred_term": "zero-downtime",
+    "banned_alternatives": ["zero downtime", "no downtime"],
+    "notes": "Hyphenate when describing deployment pipelines.",
+    "case_sensitive": false
+  }
+]

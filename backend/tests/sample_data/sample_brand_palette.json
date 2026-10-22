@@ -1,0 +1,80 @@
+{
+  "brand_name": "ApexCloud Technologies",
+  "version": "2026.1",
+  "colors": [
+    {
+      "name": "Apex Navy",
+      "hex": "#0F172A",
+      "role": "primary",
+      "wcag_contrast_white": 16.1,
+      "wcag_contrast_black": 1.3,
+      "usage": "Primary background for dark themes, main headlines on light surfaces."
+    },
+    {
+      "name": "Electric Blue",
+      "hex": "#2563EB",
+      "role": "accent",
+      "wcag_contrast_white": 4.6,
+      "wcag_contrast_black": 4.6,
+      "usage": "Interactive buttons, link text, active state pills, primary brand graphics."
+    },
+    {
+      "name": "Cyan Glow",
+      "hex": "#06B6D4",
+      "role": "secondary",
+      "wcag_contrast_white": 2.5,
+      "wcag_contrast_black": 8.4,
+      "usage": "Secondary decorative badges, telemetry charts, dark mode accents only. Never for body text on white."
+    },
+    {
+      "name": "Slate Surface",
+      "hex": "#F8FAFC",
+      "role": "neutral_light",
+      "wcag_contrast_white": 1.05,
+      "wcag_contrast_black": 20.0,
+      "usage": "Global page background for light theme, card surfaces."
+    },
+    {
+      "name": "Card Elevated",
+      "hex": "#1E293B",
+      "role": "neutral_dark",
+      "wcag_contrast_white": 11.2,
+      "wcag_contrast_black": 1.9,
+      "usage": "Elevated card surfaces in dark theme, modal borders."
+    },
+    {
+      "name": "Verified Emerald",
+      "hex": "#059669",
+      "role": "status_success",
+      "wcag_contrast_white": 4.7,
+      "wcag_contrast_black": 4.5,
+      "usage": "Claim verified pills, passed check status badges."
+    },
+    {
+      "name": "Amber Alert",
+      "hex": "#D97706",
+      "role": "status_warning",
+      "wcag_contrast_white": 3.2,
+      "wcag_contrast_black": 6.5,
+      "usage": "Expired fact warnings, tone warnings, human judgement prompts. Pair with dark icon."
+    },
+    {
+      "name": "Critical Crimson",
+      "hex": "#DC2626",
+      "role": "status_danger",
+      "wcag_contrast_white": 4.8,
+      "wcag_contrast_black": 4.4,
+      "usage": "Banned terms, unverified claims, severe compliance violations."
+    }
+  ],
+  "disallowed_colors": [
+    {
+      "hex": "#39FF14",
+      "reason": "Neon greens clash with brand authority and violate contrast rules."
+    },
+    {
+      "hex": "#FF00FF",
+      "reason": "Vibrant magenta is unapproved across all corporate marketing communications."
+    }
+  ]
+}

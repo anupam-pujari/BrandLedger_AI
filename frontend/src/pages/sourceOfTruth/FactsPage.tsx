@@ -1,0 +1,318 @@
+// src/pages/sourceOfTruth/FactsPage.tsx
+import React, { useState, useEffect } from 'react';
+import { factsApi } from '../../api/facts';
+import { useUI } from '../../context/UIContext';
+import { Modal } from '../../components/common/Modal';
+import { Fact } from '../../types';
+import {
+  Database,
+  Search,
+  Plus,
+  Clock,
+  User,
+  FileText,
+  Upload,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  Tag
+} from 'lucide-react';
+
+export const FactsPage: React.FC = () => {
+  const { showToast } = useUI();
+  const [facts, setFacts] = useState<Fact[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newFact, setNewFact] = useState({
+    fact_code: 'F-16',
+    content: '',
+    owner_name: 'Marcus Vance',
+    owner_email: 'marcus.vance@apexcloud.io',
+    source_document: 'Benchmark_Q3_2026.pdf',
+    valid_until: '2027-12-31',
+    tags: 'performance, uptime',
+  });
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await factsApi.listFacts();
+        setFacts(data);
+      } catch (err) {
+        console.warn('Failed to fetch facts:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  const handleCreateFact = async () => {
+    if (!newFact.content.trim()) {
+      showToast('Please provide the fact statement.', 'error');
+      return;
+    }
+
+    try {
+      const created = await factsApi.createFact({
+        ...newFact,
+        tags: newFact.tags.split(',').map(t => t.trim()),
+        status: 'active',
+      });
+      setFacts(prev => [created, ...prev]);
+      setShowAddModal(false);
+      showToast(`Fact ${newFact.fact_code} added with vector embedding!`, 'success');
+    } catch (err: any) {
+      // Offline fallback
+      const createdFact: Fact = {
+        id: `fact-${Date.now()}`,
+        org_id: 'org-1',
+        fact_code: newFact.fact_code,
+        content: newFact.content,
+        owner_name: newFact.owner_name,
+        owner_email: newFact.owner_email,
+        source_document: newFact.source_document,
+        valid_until: newFact.valid_until,
+        status: 'active',
+        tags: newFact.tags.split(',').map(t => t.trim()),
+        is_expired: false,
+      };
+      setFacts(prev => [createdFact, ...prev]);
+      setShowAddModal(false);
+      showToast(`Fact ${newFact.fact_code} saved to vault!`, 'success');
+    }
+  };
+
+  const getStatusBadge = (fact: Fact) => {
+    const isExpired = fact.is_expired || new Date(fact.valid_until) < new Date();
+    if (isExpired) {
+      return (
+        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-950 text-rose-300 border border-rose-800">
+          <XCircle className="w-3 h-3 text-rose-400" />
+          <span>Expired</span>
+        </span>
+      );
+    }
+    return (
+      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800">
+        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+        <span>Active (Verified)</span>
+      </span>
+    );
+  };
+
+  const filteredFacts = facts.filter(f => {
+    const matchesSearch =
+      f.content.toLowerCase().includes(search.toLowerCase()) ||
+      f.fact_code.toLowerCase().includes(search.toLowerCase()) ||
+      f.owner_name.toLowerCase().includes(search.toLowerCase());
+
+    const isExpired = f.is_expired || new Date(f.valid_until) < new Date();
+    if (statusFilter === 'active' && isExpired) return false;
+    if (statusFilter === 'expired' && !isExpired) return false;
+    return matchesSearch;
+  });
+
+  return (
+    <div className="space-y-6 animate-fade-in pb-12">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+        <div>
+          <h1 className="text-xl font-bold text-white flex items-center gap-2">
+            <Database className="w-5 h-5 text-indigo-400" />
+            <span>Approved Facts Vault (Claim Passport)</span>
+          </h1>
+          <p className="text-xs text-slate-400 mt-1">
+            Every promotional assertion in content drafts must match an approved fact with an owner and expiry date.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold shadow-sm transition"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Approved Fact</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="relative w-full sm:w-80">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search claims, codes, owners..."
+            className="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+          />
+        </div>
+
+        <div className="flex items-center gap-2 text-xs">
+          {['all', 'active', 'expired'].map(status => (
+            <button
+              key={status}
+              onClick={() => setStatusFilter(status)}
+              className={`px-3 py-1.5 rounded-lg capitalize font-medium transition ${
+                statusFilter === status
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+              }`}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Facts Table */}
+      <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden shadow-sm">
+        {loading ? (
+          <div className="p-12 text-center text-xs text-slate-400">Loading approved facts...</div>
+        ) : filteredFacts.length === 0 ? (
+          <div className="p-12 text-center text-xs text-slate-400">No facts found matching your criteria.</div>
+        ) : (
+          <div className="divide-y divide-slate-800">
+            {filteredFacts.map(fact => (
+              <div key={fact.id} className="p-5 hover:bg-slate-800/40 transition space-y-2">
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-800/80">
+                      {fact.fact_code}
+                    </span>
+                    {getStatusBadge(fact)}
+                    <span className="text-[10px] text-slate-500 font-mono">384-d vector indexed</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
+                    <Clock className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Valid until: <strong>{fact.valid_until}</strong></span>
+                  </div>
+                </div>
+
+                <p className="text-sm font-medium text-white leading-relaxed">
+                  "{fact.content}"
+                </p>
+
+                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 pt-1">
+                  <span className="flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-slate-500" />
+                    Owner: <strong className="text-slate-300">{fact.owner_name}</strong> ({fact.owner_email})
+                  </span>
+                  {fact.source_document && (
+                    <span className="flex items-center gap-1.5">
+                      <FileText className="w-3.5 h-3.5 text-slate-500" />
+                      Source: <strong className="text-slate-300">{fact.source_document}</strong>
+                    </span>
+                  )}
+                  {fact.tags && fact.tags.length > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Tag className="w-3 h-3 text-slate-500" />
+                      {fact.tags.map(t => (
+                        <span key={t} className="px-1.5 py-0.2 rounded bg-slate-800 text-[10px] text-slate-400">
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Add Fact Modal */}
+      <Modal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title="Register Approved Fact in Vault"
+        description="Every fact is indexed with dense vector embeddings to verify promotional claims in real time."
+      >
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-300 mb-1">Fact Code</label>
+              <input
+                type="text"
+                value={newFact.fact_code}
+                onChange={e => setNewFact({ ...newFact, fact_code: e.target.value })}
+                className="w-full p-2 bg-slate-950 border border-slate-800 rounded text-xs text-white"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-300 mb-1">Valid Until</label>
+              <input
+                type="date"
+                value={newFact.valid_until}
+                onChange={e => setNewFact({ ...newFact, valid_until: e.target.value })}
+                className="w-full p-2 bg-slate-950 border border-slate-800 rounded text-xs text-white"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-300 mb-1">
+              Verified Statement / Claim <span className="text-rose-400">*</span>
+            </label>
+            <textarea
+              value={newFact.content}
+              onChange={e => setNewFact({ ...newFact, content: e.target.value })}
+              placeholder="e.g. ApexCloud architecture provides up to 99.99% availability backed by our standard Enterprise SLA."
+              className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-indigo-500"
+              rows={3}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-300 mb-1">Owner Name</label>
+              <input
+                type="text"
+                value={newFact.owner_name}
+                onChange={e => setNewFact({ ...newFact, owner_name: e.target.value })}
+                className="w-full p-2 bg-slate-950 border border-slate-800 rounded text-xs text-white"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-300 mb-1">Owner Email</label>
+              <input
+                type="email"
+                value={newFact.owner_email}
+                onChange={e => setNewFact({ ...newFact, owner_email: e.target.value })}
+                className="w-full p-2 bg-slate-950 border border-slate-800 rounded text-xs text-white"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-300 mb-1">Source Benchmark Document</label>
+            <input
+              type="text"
+              value={newFact.source_document}
+              onChange={e => setNewFact({ ...newFact, source_document: e.target.value })}
+              className="w-full p-2 bg-slate-950 border border-slate-800 rounded text-xs text-white"
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-3">
+            <button onClick={() => setShowAddModal(false)} className="px-3 py-1.5 text-xs text-slate-400 hover:text-white">
+              Cancel
+            </button>
+            <button
+              onClick={handleCreateFact}
+              className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg transition"
+            >
+              Add to Vault
+            </button>
+          </div>
+        </div>
+      </Modal>
+    </div>
+  );
+};

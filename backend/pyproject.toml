@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "brandproof-backend"
+version = "0.1.0"
+description = "BrandProof AI — Brand Governance Platform Backend Service"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "Anupam Pujari", email = "pujarianupam253@gmail.com" },
+    { name = "Jnanaranjan Majhi", email = "jnanaranjanmajhi82@gmail.com" }
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Framework :: FastAPI",
+    "Operating System :: OS Independent",
+]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
+python_files = [
+    "test_*.py",
+    "*_test.py",
+]
+asyncio_mode = "auto"
+filterwarnings = [
+    "ignore::FutureWarning",
+    "ignore::DeprecationWarning",
+]
+
+[tool.pyright]
+include = ["app", "tests"]
+venvPath = "."
+venv = ".venv"
+reportMissingImports = "none"
+reportMissingTypeStubs = "none"
+reportOptionalMemberAccess = "none"
+reportOptionalSubscript = "none"
+
