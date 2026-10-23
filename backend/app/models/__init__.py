@@ -1,1 +1,4 @@
-"""Pydantic request, response, and domain models."""
+"""
+Compatibility re-exports: routes and services can import unified schemas.
+"""
+from app.schemas import *

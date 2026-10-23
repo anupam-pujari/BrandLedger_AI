@@ -1,193 +1,312 @@
 """
-Content & Version Management API Router (T-061, T-062, T-063, T-064, T-065, T-066, T-100, T-101).
+BrandProof Content Lifecycle, Review Execution & Workflow API Router.
+
+Implements the complete review journey from planing.txt (Section 4 & Section 5):
+  1. Draft creation with Intent Lock (purpose, audience, key message)
+  2. Review check trigger -> runs hybrid engine & Claim Passport
+  3. Finding resolution (accept / edit / dismiss with mandatory reason for critical items)
+  4. Role-based review queue (creator submit -> reviewer request changes -> manager approve)
+  5. Version diffing and PDF approval record export
 """
 
-from typing import Optional
-from fastapi import APIRouter, Depends, Query, status
+import difflib
+from typing import Any, Dict, List, Optional
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Response, status
 
-from app.dependencies import get_current_user, require_role
-from app.middleware.auth import CurrentUser
-from app.db.client import get_supabase_admin
-from app.db.repositories.content_repo import ContentRepository
-from app.models.content import ContentCreate, ContentUpdate
+from app.api.auth import get_current_user_from_header
+from app.engine.orchestrator import ReviewOrchestrator
+from app.schemas import (
+    AIDisclosure,
+    ApiResponse,
+    Comment,
+    CommentCreateRequest,
+    ContentCreateRequest,
+    ContentItem,
+    ContentUpdateRequest,
+    Finding,
+    FindingReasonRequiredError,
+    FindingResolveRequest,
+    InvalidTransitionError,
+    SelfApprovalError,
+)
+from app.store import store
 
-router = APIRouter(prefix="/content", tags=["Content & Versions"])
+router = APIRouter(tags=["Content Review & Governance"])
 
 
-@router.get("")
+# ==============================================================================
+# Content Items & Versions
+# ==============================================================================
+
+@router.get("/content", response_model=ApiResponse[Dict[str, Any]])
 async def list_content(
-    status: Optional[str] = None,
-    author_id: Optional[str] = None,
-    content_type: Optional[str] = None,
-    limit: int = Query(50, ge=1, le=100),
-    current_user: CurrentUser = Depends(get_current_user)
+    status: Optional[str] = Query(None),
+    author_id: Optional[str] = Query(None),
+    user: Dict[str, Any] = Depends(get_current_user_from_header),
 ):
-    admin_client = get_supabase_admin()
-    items = await ContentRepository.list_content(
-        client=admin_client,
-        org_id=current_user.org_id,
-        status=status,
-        author_id=author_id,
-        content_type=content_type,
-        limit=limit
-    )
-    return {
-        "success": True,
-        "data": {"content_items": items},
-        "error": None,
-        "meta": {"total": len(items)}
-    }
+    items = store.list_content(org_id=user["org_id"], status=status, author_id=author_id)
+    return ApiResponse(data={"content_items": [ContentItem(**c) for c in items]})
 
 
-@router.post("", status_code=status.HTTP_201_CREATED)
+@router.post("/content", response_model=ApiResponse[Dict[str, Any]], status_code=status.HTTP_201_CREATED)
 async def create_content(
-    payload: ContentCreate,
-    current_user: CurrentUser = Depends(require_role("creator", "brand_manager", "admin"))
+    payload: ContentCreateRequest,
+    user: Dict[str, Any] = Depends(get_current_user_from_header),
 ):
-    admin_client = get_supabase_admin()
-    item = await ContentRepository.create(
-        client=admin_client,
-        org_id=current_user.org_id,
-        author_id=current_user.id,
-        content_data=payload.model_dump()
+    item = store.create_content(
+        org_id=user["org_id"],
+        author_id=user["id"],
+        data=payload.model_dump(),
     )
-    return {
-        "success": True,
-        "data": {
-            "content_item": item,
-            "version": item.get("current_version")
-        },
-        "error": None,
-        "meta": None
-    }
+    return ApiResponse(data={"content_item": ContentItem(**item)})
 
 
-@router.get("/{content_id}")
-async def get_content(
-    content_id: str,
-    current_user: CurrentUser = Depends(get_current_user)
-):
-    admin_client = get_supabase_admin()
-    item = await ContentRepository.get_by_id(admin_client, current_user.org_id, content_id)
-    return {
-        "success": True,
-        "data": {
-            "content_item": item,
-            "current_version": item.get("current_version"),
-            "findings_summary": {"critical": 0, "warning": 0, "info": 0}
-        },
-        "error": None,
-        "meta": None
-    }
+@router.get("/content/{content_id}", response_model=ApiResponse[Dict[str, Any]])
+async def get_content(content_id: str, user: Dict[str, Any] = Depends(get_current_user_from_header)):
+    item = store.get_content(org_id=user["org_id"], content_id=content_id)
+    return ApiResponse(data={"content_item": ContentItem(**item)})
 
 
-@router.put("/{content_id}")
+@router.put("/content/{content_id}", response_model=ApiResponse[Dict[str, Any]])
 async def update_content(
     content_id: str,
-    payload: ContentUpdate,
-    current_user: CurrentUser = Depends(require_role("creator", "brand_manager", "admin"))
+    payload: ContentUpdateRequest,
+    user: Dict[str, Any] = Depends(get_current_user_from_header),
 ):
-    admin_client = get_supabase_admin()
-    item = await ContentRepository.update(
-        client=admin_client,
-        org_id=current_user.org_id,
+    body = payload.body or ""
+    item = store.update_content(
+        org_id=user["org_id"],
         content_id=content_id,
-        user_id=current_user.id,
-        update_data=payload.model_dump(exclude_unset=True),
-        user_role=current_user.role
+        body=body,
+        author_id=user["id"],
     )
-    return {
-        "success": True,
-        "data": {
-            "content_item": item,
-            "version": item.get("current_version")
-        },
-        "error": None,
-        "meta": None
-    }
+    return ApiResponse(data={"content_item": ContentItem(**item)})
 
 
-@router.get("/{content_id}/versions")
-async def list_versions(
+# ==============================================================================
+# Review Engine Execution (planing.txt Section 4, Stage 3)
+# ==============================================================================
+
+@router.post("/content/{content_id}/check", response_model=ApiResponse[Dict[str, Any]])
+async def trigger_review_check(
     content_id: str,
-    current_user: CurrentUser = Depends(get_current_user)
+    user: Dict[str, Any] = Depends(get_current_user_from_header),
 ):
-    admin_client = get_supabase_admin()
-    versions = await ContentRepository.list_versions(
-        client=admin_client,
-        org_id=current_user.org_id,
-        content_id=content_id
+    """
+    Executes Hybrid Review Engine on current draft:
+    Deterministic checks -> Privacy masking -> Claim Passport & Tone -> Intent Lock ranking.
+    """
+    content_item = store.get_content(org_id=user["org_id"], content_id=content_id)
+    version = content_item["latest_version"]
+    rules = store.list_rules(org_id=user["org_id"], status="approved")
+    facts = store.list_facts(org_id=user["org_id"])
+    terms = store.list_terms(org_id=user["org_id"])
+    assets = store.list_assets(org_id=user["org_id"])
+    org_settings = store.get_org_settings(user["org_id"])
+
+    review_result = await ReviewOrchestrator.run_review(
+        content_item=content_item,
+        content_version=version,
+        rules=rules,
+        facts=facts,
+        terms=terms,
+        assets=assets,
+        org_settings=org_settings,
     )
-    return {
-        "success": True,
-        "data": {"versions": versions},
-        "error": None,
-        "meta": {"total": len(versions)}
-    }
+
+    # Persist findings to store
+    store.save_findings(content_id=content_id, findings=review_result["findings"])
+
+    # Persist AI disclosure record if generated
+    if review_result.get("ai_disclosure"):
+        store.save_ai_disclosure(content_id=content_id, disclosure=review_result["ai_disclosure"])
+
+    content_item["status"] = "checked"
+    content_item["findings_count"] = review_result["findings_count"]
+
+    return ApiResponse(data=review_result)
 
 
-@router.get("/{content_id}/versions/{v1}/diff/{v2}")
+@router.get("/content/{content_id}/check-status", response_model=ApiResponse[Dict[str, Any]])
+async def get_check_status(content_id: str, user: Dict[str, Any] = Depends(get_current_user_from_header)):
+    item = store.get_content(org_id=user["org_id"], content_id=content_id)
+    return ApiResponse(data={
+        "status": "completed" if item["status"] != "draft" else "idle",
+        "findings_count": item.get("findings_count", 0),
+        "progress_percent": 100 if item["status"] != "draft" else 0,
+    })
+
+
+# ==============================================================================
+# Findings Management & Resolution (planing.txt Line 73, Line 100)
+# ==============================================================================
+
+@router.get("/content/{content_id}/findings", response_model=ApiResponse[Dict[str, Any]])
+async def list_findings(
+    content_id: str,
+    category: Optional[str] = Query(None),
+    severity: Optional[str] = Query(None),
+    user: Dict[str, Any] = Depends(get_current_user_from_header),
+):
+    findings = store.list_findings(org_id=user["org_id"], content_id=content_id, category=category, severity=severity)
+    return ApiResponse(data={"findings": [Finding(**f) for f in findings]})
+
+
+@router.patch("/content/{content_id}/findings/{finding_id}", response_model=ApiResponse[Dict[str, Any]])
+async def resolve_finding(
+    content_id: str,
+    finding_id: str,
+    payload: FindingResolveRequest,
+    user: Dict[str, Any] = Depends(get_current_user_from_header),
+):
+    resolved = store.resolve_finding(
+        org_id=user["org_id"],
+        content_id=content_id,
+        finding_id=finding_id,
+        status=payload.status,
+        dismiss_reason=payload.dismiss_reason,
+        edited_text=payload.edited_text,
+        user_id=user["id"],
+    )
+    return ApiResponse(data={"finding": Finding(**resolved)})
+
+
+# ==============================================================================
+# Review & Approval Workflow (planing.txt Line 60-75)
+# ==============================================================================
+
+@router.post("/content/{content_id}/submit-for-review", response_model=ApiResponse[Dict[str, Any]])
+async def submit_for_review(content_id: str, user: Dict[str, Any] = Depends(get_current_user_from_header)):
+    item = store.submit_for_review(org_id=user["org_id"], content_id=content_id, user_id=user["id"])
+    return ApiResponse(data={"content_item": ContentItem(**item)})
+
+
+@router.post("/content/{content_id}/approve", response_model=ApiResponse[Dict[str, Any]])
+async def approve_content(content_id: str, user: Dict[str, Any] = Depends(get_current_user_from_header)):
+    """
+    Brand Manager final approval.
+    Enforces governance rule: No author can approve their own content (planing.txt Line 84).
+    """
+    item = store.approve_content(org_id=user["org_id"], content_id=content_id, user_id=user["id"])
+    return ApiResponse(data={"content_item": ContentItem(**item)})
+
+
+@router.post("/content/{content_id}/request-changes", response_model=ApiResponse[Dict[str, Any]])
+async def request_changes(
+    content_id: str,
+    payload: Dict[str, Any],
+    user: Dict[str, Any] = Depends(get_current_user_from_header),
+):
+    notes = payload.get("notes", "")
+    item = store.request_changes(org_id=user["org_id"], content_id=content_id, notes=notes, user_id=user["id"])
+    return ApiResponse(data={"content_item": ContentItem(**item)})
+
+
+# ==============================================================================
+# Version Comparison & Diff (planing.txt Line 103, Line 139)
+# ==============================================================================
+
+@router.get("/content/{content_id}/versions/{v1}/diff/{v2}", response_model=ApiResponse[Dict[str, Any]])
 async def get_version_diff(
     content_id: str,
     v1: int,
     v2: int,
-    current_user: CurrentUser = Depends(get_current_user)
+    user: Dict[str, Any] = Depends(get_current_user_from_header),
 ):
-    admin_client = get_supabase_admin()
-    diff_data = await ContentRepository.get_version_diff(
-        client=admin_client,
-        org_id=current_user.org_id,
-        content_id=content_id,
-        v1_num=v1,
-        v2_num=v2
+    ver1 = store.get_version(content_id, v1)
+    ver2 = store.get_version(content_id, v2)
+
+    text1 = ver1.get("body", "") if ver1 else ""
+    text2 = ver2.get("body", "") if ver2 else ""
+
+    diff_ops: List[List[Any]] = []
+
+    try:
+        from diff_match_patch import diff_match_patch
+        dmp = diff_match_patch()
+        diffs = dmp.diff_main(text1, text2)
+        dmp.diff_cleanupSemantic(diffs)
+        diff_ops = [[op, txt] for op, txt in diffs]
+    except Exception:
+        # Standard difflib fallback
+        matcher = difflib.SequenceMatcher(None, text1, text2)
+        for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+            if tag == "equal":
+                diff_ops.append([0, text1[i1:i2]])
+            elif tag == "delete":
+                diff_ops.append([-1, text1[i1:i2]])
+            elif tag == "insert":
+                diff_ops.append([1, text2[j1:j2]])
+            elif tag == "replace":
+                diff_ops.append([-1, text1[i1:i2]])
+                diff_ops.append([1, text2[j1:j2]])
+
+    return ApiResponse(data={"diff": diff_ops})
+
+
+# ==============================================================================
+# AI Disclosure Audit Trail (planing.txt Line 110, Line 149)
+# ==============================================================================
+
+@router.get("/content/{content_id}/ai-disclosures", response_model=ApiResponse[Dict[str, Any]])
+async def get_ai_disclosures(content_id: str, user: Dict[str, Any] = Depends(get_current_user_from_header)):
+    disclosures = store.get_ai_disclosures(content_id)
+    return ApiResponse(data={"disclosures": [AIDisclosure(**d) for d in disclosures]})
+
+
+# ==============================================================================
+# PDF Approval Record Export (planing.txt Line 75, Line 104)
+# ==============================================================================
+
+@router.get("/content/{content_id}/export/pdf")
+async def export_approval_pdf(content_id: str, user: Dict[str, Any] = Depends(get_current_user_from_header)):
+    """Generate and return PDF approval certificate record."""
+    item = store.get_content(org_id=user["org_id"], content_id=content_id)
+    findings = store.list_findings(org_id=user["org_id"], content_id=content_id)
+
+    # Clean PDF bytes generation
+    pdf_text = (
+        f"%PDF-1.4\n"
+        f"1 0 obj << /Title ({item['title']}) /Author ({user.get('display_name', 'BrandProof')}) >> endobj\n"
+        f"2 0 obj << /Type /Catalog /Pages 3 0 R >> endobj\n"
+        f"3 0 obj << /Type /Pages /Kids [4 0 R] /Count 1 >> endobj\n"
+        f"4 0 obj << /Type /Page /Parent 3 0 R /MediaBox [0 0 612 792] /Contents 5 0 R >> endobj\n"
+        f"5 0 obj << /Length 200 >> stream\n"
+        f"BT /F1 14 Tf 50 720 Td (BRANDPROOF AUDIT & APPROVAL RECORD) Tj ET\n"
+        f"BT /F1 10 Tf 50 690 Td (Document: {item['title']}) Tj ET\n"
+        f"BT /F1 10 Tf 50 670 Td (Status: {item['status'].upper()} | Version: v{item['current_version']}) Tj ET\n"
+        f"BT /F1 10 Tf 50 650 Td (Governance Checks Passed: {len([f for f in findings if f.get('status') == 'accepted'])} resolved) Tj ET\n"
+        f"endstream\nendobj\nxref\n0 6\n0000000000 65535 f \n"
+        f"trailer << /Size 6 /Root 2 0 R >>\nstartxref\n500\n%%EOF"
     )
-    return {
-        "success": True,
-        "data": diff_data,
-        "error": None,
-        "meta": None
-    }
+
+    return Response(
+        content=pdf_text.encode("utf-8"),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="brandproof_approval_{content_id}.pdf"'},
+    )
 
 
-@router.post("/{content_id}/submit-for-review")
-async def submit_for_review(
+# ==============================================================================
+# Comments & Discussion
+# ==============================================================================
+
+@router.get("/content/{content_id}/comments", response_model=ApiResponse[Dict[str, Any]])
+async def list_comments(content_id: str):
+    comments = store.list_comments(content_id)
+    return ApiResponse(data={"comments": [Comment(**c) for c in comments]})
+
+
+@router.post("/content/{content_id}/comments", response_model=ApiResponse[Dict[str, Any]], status_code=status.HTTP_201_CREATED)
+async def add_comment(
     content_id: str,
-    current_user: CurrentUser = Depends(require_role("creator", "brand_manager", "admin"))
+    payload: CommentCreateRequest,
+    user: Dict[str, Any] = Depends(get_current_user_from_header),
 ):
-    admin_client = get_supabase_admin()
-    item = await ContentRepository.transition_status(
-        client=admin_client,
-        org_id=current_user.org_id,
+    comment = store.add_comment(
         content_id=content_id,
-        target_status="in_review",
-        actor_id=current_user.id,
-        actor_role=current_user.role
+        author_id=user["id"],
+        text=payload.text,
+        finding_id=payload.finding_id,
     )
-    return {
-        "success": True,
-        "data": {"content_item": item},
-        "error": None,
-        "meta": None
-    }
-
-
-@router.post("/{content_id}/approve")
-async def approve_content(
-    content_id: str,
-    current_user: CurrentUser = Depends(require_role("brand_manager", "admin"))
-):
-    admin_client = get_supabase_admin()
-    item = await ContentRepository.transition_status(
-        client=admin_client,
-        org_id=current_user.org_id,
-        content_id=content_id,
-        target_status="approved",
-        actor_id=current_user.id,
-        actor_role=current_user.role
-    )
-    return {
-        "success": True,
-        "data": {"content_item": item},
-        "error": None,
-        "meta": None
-    }
+    return ApiResponse(data={"comment": Comment(**comment)})

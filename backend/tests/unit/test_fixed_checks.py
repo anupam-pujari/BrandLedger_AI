@@ -4,14 +4,17 @@ Tests terminology, banned words, required text, readability, link text, alt-text
 """
 
 import pytest
-from app.engine.fixed_checks.terminology import check_terminology
-from app.engine.fixed_checks.banned_words import check_banned_words
-from app.engine.fixed_checks.required_text import check_required_text
-from app.engine.fixed_checks.readability import check_readability
-from app.engine.fixed_checks.link_text import check_link_text
-from app.engine.fixed_checks.alt_text import check_alt_text
-from app.engine.fixed_checks.contrast import check_wcag_contrast, calculate_contrast_ratio
-from app.engine.fixed_checks.palette import check_palette
+from app.engine.checks import (
+    check_terminology,
+    check_banned_words,
+    check_required_text,
+    check_readability,
+    check_link_text,
+    check_alt_text,
+    check_wcag_contrast,
+    calculate_contrast_ratio,
+    check_palette,
+)
 
 
 def test_terminology_check(sample_terms):
