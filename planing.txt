@@ -1,0 +1,230 @@
+BrandProof: Round 1 Plan
+At a glance
+BrandProof is a brand-governance platform that checks content against approved sources before it is published, proves every finding, and leaves each final decision to a human.
+Product: BrandProof · Tagline: Every finding comes with proof. · Event: Inkloom AI Hackathon, brand governance track · Round 1: plan and idea submission
+Five ideas set it apart from a generic AI checker:
+1.	Rulebook Compiler. It turns brand PDFs into structured, testable rules, each linked to the page and line it came from. A human approves every rule before it is used.
+2.	Hybrid review engine. Fixed checks (terms, colors, contrast, alt text) run first. AI handles only judgement calls such as tone and claim support, so results are faster, cheaper and explainable.
+3.	Claim Passport. Every promotional claim must match an approved fact that has an owner and an expiry date. Otherwise, it is flagged as unsupported or outdated.
+4.	Intent Lock. The creator state’s purpose, audience, and key message once. Suggestions must keep that intent, and a meaning check shows what would change before anything is applied.
+5.	Rule Health insights. The platform finds guidelines that are unclear by tracking which rules are disputed or overridden most, then proposes clearer wording.
+1. Understanding of the problem statement
+Brand inconsistency is a scale-and-trust problem: more people and AI tools publish faster than any manager can check, so mistakes reach the public before anyone notices.
+Organizations now publish through employees, agencies, freelancers and AI writing tools. Each works from a different memory of the brand: an old deck, a chat message, a model's guess. The damage is quiet, because a wrong claim or an off-tone post costs credibility long before anyone corrects it.
+Problem in the statement	Why it happens	BrandProof response
+Incorrect or outdated claims	Facts change, but old numbers stay in circulation	Approved Facts Vault with an owner and expiry date; every claim must match a fact
+Inconsistent language and tone	Guidelines are long PDFs, and vague rules like "friendly but professional" cannot be checked	Rulebook Compiler turns them into structured rules with good and bad examples
+Off-brand or inaccessible visuals	Assets are scattered; accessibility is checked late or never	Asset library plus automatic colour, contrast and alt-text checks
+Slow, uneven review	Managers read everything by hand	A pre-check clears routine issues so humans review only judgement calls
+Creators ignore plain rejections	A "no" with no reason or fix feels arbitrary	Each finding names the rule, shows proof and offers an optional fix
+Confidential brand data	Pasting guidelines into outside AI tools can leak them	Workspace isolation, masking and a visible AI-use disclosure
+From the statement we draw four rules for any good solution:
+•	It checks only against approved sources, never against the model's own opinion of the brand.
+•	It explains every finding and names the guideline or fact involved.
+•	It suggests, but never overrides, a human decision.
+•	It learns where the guidelines themselves are unclear, so the rules improve over time.
+2. Users affected by the problem
+Six groups feel the problem, and the product is built around the first four, who touch every piece of content.
+User	Role in the content flow	Pain today	What they need from BrandProof
+Content creators (marketing, sales, support, HR staff)	Write posts, emails, slides, web copy	Unsure of the rules; learn of mistakes only after rejection or publication	Fast, specific, kind feedback before they submit, with a fix they can accept in one click
+Agencies and freelancers	Produce content outside the company	Work from outdated guidelines; no access to internal facts	Limited-access workspace with the current rules and facts, and no view of confidential material
+Brand and marketing managers	Own consistency and approve content	Read every draft by hand; the same mistakes repeat	Pre-checked drafts, a clear approval queue, and insight into what keeps going wrong
+Authorised reviewers (legal, compliance, product experts)	Approve claims in their domain	Asked to check the same claims repeatedly	Review only flagged items, with the source fact attached
+Guideline and fact owners	Maintain rules, approved facts, assets	No idea which rules people misread or ignore	Rule Health insights and an easy way to update facts
+Leadership and the audience	Bear the reputational risk; read the content	A single false claim damages trust	An audit trail showing that content was checked and who approved it
+The most under-served user is the creator. A tool that only rejects content leaves creators guessing; BrandProof is designed to teach as it checks.
+3. Proposed solution
+BrandProof turns an organisation's approved material into a "Source of Truth", checks every draft against it before publication, and returns findings that cite their proof and offer fixes the creator can accept or reject.
+What the system knows
+•	Rulebook. Structured rules built from the guidelines. Each has an ID, a category (tone, terminology, messaging, visual, accessibility, claims), a severity, the source page and quote, and one good and one bad example.
+•	Approved Facts Vault. Product facts, figures and certifications, each with an owner, a source document and a "valid until" date.
+•	Terminology list. Preferred terms, banned terms, spellings and capitalisation.
+•	Asset library. Logos, colour palette, fonts and approved images with usage notes.
+How the five ideas work
+•	Rulebook Compiler. The brand manager uploads guideline PDFs. The system proposes rules, the manager edits and approves them, and only approved rules are ever used in a review. Vague rules are marked "needs examples" rather than guessed at.
+•	Hybrid review engine. Code does what code can do exactly: term matching, colour distance, WCAG contrast, missing alt text, readability. AI is called only for tone and claim support, and its output must follow a fixed JSON format that names the rule or fact it relied on.
+•	Claim Passport. The system extracts each factual or promotional claim, searches the Facts Vault, and labels it supported, outdated (fact expired), conflicting or unsupported.
+•	Intent Lock. Each suggestion is generated with the creator's purpose, audience and key message as constraints. A meaning check then lists the key points before and after the change, so the creator sees nothing important was lost.
+•	Rule Health. Every dismissal, override and repeated trigger is logged. Rules that are often disputed are surfaced as unclear, with a proposed rewrite for the manager to approve.
+
+A sample finding (sample brand data, for illustration)
+Flagged text	Issue	Proof	Suggested fix
+"cuts reporting time by 60%"	Outdated claim	Fact F-07 says 45% and expired on 30 Jun 2026	"cuts reporting time by up to 45%", pending owner re-approval
+"the fastest in India"	Unsupported claim	No approved fact supports a ranking	"generates reports in under 5 seconds" (Fact F-12)
+"guaranteed"	Banned term	Rule R-21: avoid guarantees in promotional copy	"designed to"
+Principles we will not trade away
+•	Human in control. AI never edits, approves or publishes on its own. Every suggestion can be accepted, edited or dismissed, and an override needs a short reason that is logged.
+•	Explainable. No finding appears without a cited rule or fact. When confidence is low, the finding is labelled "needs human judgement" instead of being stated as fact.
+•	Private by design. Each organisation's data is isolated, confidential items are masked before any external AI call, and every review shows which AI service was used and what it saw.
+4. Complete product workflow
+Content moves through five stages, and a human decision gates every step that matters.
+ 
+workflow · 5 stages, 2 loops, 1 feedback path
+Creators fix issues before review, reviewers can send content back, and only the manager's final approval makes content ready for publication.
+A. One-time setup (brand manager)
+1.	Create the organisation workspace, invite people and assign roles.
+2.	Upload guideline PDFs, fact sheets, terminology lists and assets such as logos and the colour palette.
+3.	Review the rules proposed by the Rulebook Compiler. Edit, approve or reject each one, and add good and bad examples where a rule is marked "needs examples".
+4.	Add each approved fact with an owner, a source document and a "valid until" date.
+B. For every piece of content
+1.	Draft. The creator pastes text or uploads a document, an image, or a social post (caption plus image). They fill in the Intent Lock: purpose, audience and key message.
+2.	Prepare. The system extracts the text (including text inside images), masks anything tagged confidential, and shows what will be sent to any outside AI service.
+3.	Pre-check. Fixed checks run first, then AI checks for tone and claims. Findings are sorted by severity, each with its proof.
+4.	Fix. The creator accepts, edits or dismisses each suggestion. Dismissing a high-severity finding needs a short reason. The meaning check confirms the Intent Lock still holds, and the content is re-checked.
+5.	Review. The creator submits. Reviewers see only the flagged items and what changed since the last version. They comment, approve or request changes, and claims go to the fact owner.
+6.	Approve. The brand manager gives final approval. The content becomes "Approved for publication", and its full history (versions, comments, decisions, AI use) is saved and can be exported as a PDF approval record.
+C. Learning loop
+Findings, dismissals and overrides feed the Rule Health dashboard. Managers use it to clarify rules, renew expiring facts and spot recurring mistakes by team. In the first version, publishing itself happens outside BrandProof.
+Roles and permissions
+Role	Can do	Cannot do
+Creator (staff or agency)	Submit content, resolve findings, comment	Approve content; change rules or facts
+Reviewer (for example legal or product)	Review assigned content, approve or request changes, comment	Change rules or facts
+Brand manager	Give final approval, edit and approve rules and facts, view insights	Manage users or privacy settings
+Admin	Manage users, roles, privacy and AI-use settings	Approve content unless also assigned as a reviewer
+No one can approve their own content.
+5. Main features we intend to build
+We will build 19 "Must" features, each as a thin but working slice, so that together they form a complete workflow. Everything else is a stretch goal and is cut first if time runs short.
+Area	Feature	Priority
+Set up the Source of Truth	Rulebook Compiler: guideline PDF or DOCX to proposed rules, each with its source page and quote	Must
+	Approved Facts Vault with owner, source and expiry date; CSV import	Must
+	Terminology manager: preferred and banned terms with notes	Must
+	Asset library: logos and colour palette with usage notes	Must
+Review content	Terminology, banned-word and required-text checks (for example a legal disclaimer)	Must
+	Tone check against the rulebook's good and bad examples	Must
+	Claim Passport: claim extraction, fact matching, expiry check	Must
+	Visual checks: palette match, image resolution, logo presence	Must
+	Accessibility checks: colour contrast, missing alt text, readability level, vague link text	Must
+	Logo misuse detection using an image-understanding model	Could
+Explain and fix	Finding card: what, why, the rule or fact involved, severity, confidence	Must
+	Intent Lock with suggested fixes and the meaning check	Must
+	Accept, edit or dismiss each suggestion; reason required for high-severity dismissals	Must
+Collaborate	Role-based access for creators, reviewers, managers and admins	Must
+	Review queue, comments on findings and text, approve or request changes	Must
+	Version history with side-by-side comparison	Must
+	PDF approval record and in-app notifications	Should
+	Email notifications	Could
+Learn over time	Recurring-mistakes dashboard by rule, category and team	Must
+	Rule Health: dispute and override rates, with "unclear rule" flags	Must
+	AI-suggested rewrites of unclear rules; fact-expiry alerts	Should
+Protect and disclose	Workspace isolation, confidential tags and masking before any AI call	Must
+	AI-use disclosure panel on every review; a "rules only" mode with no AI calls	Must
+	Choice of AI provider, including a locally hosted model	Could
+Content formats
+Format	How we handle it	Priority
+Text, social posts, emails	Direct text review; social posts pair a caption with an image	Must
+DOCX and text-based PDF	Text and headings extracted, then reviewed as text	Must
+Images (PNG, JPG)	Text read with OCR; palette, size and contrast checked; alt text field	Must
+PowerPoint slides	Text and images extracted slide by slide	Should
+Video and audio	Review of the transcript	Later
+
+
+
+
+
+
+6. Technology stack
+We chose Python and React stack on a managed database, so three people can build a full product with tools they can learn quickly and that have large communities.
+ 
+architecture · 3 layers, 1 privacy gate
+The web app talks only to our API. The API reads and writes the database and files, and reaches the AI service only through the privacy gate. Arrows run both ways: requests go out and results come back.
+Layer	Choice	Why we chose it
+Frontend	React, Vite, Tailwind CSS	Fast to build; one app serves all four roles
+Backend API	Python with FastAPI	Python has the best text, image and AI libraries; Pydantic validates every AI response
+Database, login, files	Supabase: PostgreSQL, Auth, Storage	Roles and workspace isolation through row-level security, without writing login code
+Search over rules and facts	Sentence-transformers embeddings (all-MiniLM-L6-v2, runs on a CPU) with pgvector	Finds the nearest rules and facts for each claim, with no extra service
+AI reasoning	A hosted large-language-model API, used through structured JSON output	Used only for tone and claim support; wrapped in one interface so the provider can be swapped or replaced by a local model
+Fixed text checks	spaCy PhraseMatcher, regular expressions, textstat	Exact, fast, free and explainable
+Documents	PyMuPDF (PDF), python-docx (DOCX), python-pptx (slides, stretch)	Standard, well-documented text extraction
+Images	Pillow, scikit-learn (dominant colours), WCAG contrast formula, Tesseract OCR	Palette and contrast checks need no AI; OCR lets text in images join the text checks
+Version comparison	diff-match-patch	Side-by-side change view between drafts
+Hosting and tools	Vercel (frontend), Render (backend), Docker for local setup, GitHub with pytest tests	Free tiers are enough for a demo
+How we keep results reliable and explainable
+•	Every AI answer must follow a fixed JSON format that names a rule ID or fact ID. A finding without a valid ID is discarded.
+•	Every quoted piece of evidence must appear word for word in the draft or in the source. Otherwise the finding is discarded, which blocks most invented evidence.
+•	Low-confidence findings are shown as "needs human judgement", not as facts.
+•	We keep a "golden set" of 40 to 50 sample drafts with known issues, and measure how many issues we catch and how many false alarms we raise after each change.
+How we protect confidential material and disclose AI use
+•	Each organisation's data is isolated by row-level security, and files sit in private storage with expiring links.
+•	Before any external AI call, a masking step replaces confidential-tagged text, email addresses and phone numbers with placeholders.
+•	A disclosure panel on every review shows the provider used, the exact masked text that was sent, and the time.
+•	A "rules only" mode runs all fixed checks with no external AI call, for drafts that must not leave the system.
+•	Findings are labelled "Rule check" or "AI-assisted", and secret keys stay on the server, never in the browser.
+7. Responsibilities of each team member
+Work is split into three lanes that meet at a written API contract, so the frontend and backend can be built in parallel from the first week.
+
+Member	Role	Main responsibilities
+Jnanaranjan Majhi	Team leader; product and AI engine lead	Owns scope and priorities. Builds the review engine: fixed checks, Claim Passport, tone check, Intent Lock and the meaning check, with JSON validation. Builds the golden test set. Leads integration, the final pitch and the submission.
+Anupam Pujari	Backend and data lead	Builds the FastAPI service and the Supabase schema, roles and row-level security. Builds the review and approval workflow, version history and audit log. Builds document and image parsing (PDF, DOCX, OCR) and the Rulebook Compiler pipeline. Handles deployment.
+Jyoti Patra	Frontend and experience lead	Builds the React app: setup screens, finding cards, review queue, comments and the Rule Health dashboard. Designs the user flow and makes our own interface accessible. Prepares the sample brand data and demo content and runs user testing.
+Shared by all three
+•	A 15-minute daily check-in and a shared task board.
+•	Every change goes through a pull request that another member reviews.
+•	Each person writes tests for their own module.
+•	Everyone helps write the sample brand data, the demo script and the pitch rehearsal.
+8. Development plan across the three rounds
+We build the riskiest and most visible parts first, so a working end-to-end demo exists at the end of Round 2 and Round 3 adds depth and polish. The plan follows deliverables rather than dates, because the organiser's round schedule decides the calendar.
+ 
+roadmap · 3 rounds, 3 gates (not to scale)
+The three bands are equal and not drawn to scale. Each gate is our own check, and if one is at risk we cut Could and Should items first.
+Round	Focus	Key work	Exit check
+Round 1: Plan (this document)	Reduce risk and align the team	Problem analysis, scoped plan and user flows. Screen wireframes. Draft data model and API contract. Sample brand data for a fictional company. A small test that runs the AI on sample claims and on one sample guideline PDF and checks that the output format holds. Repository and task board.	Plan submitted; the test shows claim matching works on the sample facts
+Round 2: Working prototype	One complete path from draft to approval	Sprint 1: login, roles, database, API skeleton, and setup screens for rules, facts, terms and assets (manual entry and CSV import). Sprint 2: fixed checks, Claim Passport, tone check, masking and disclosure panel, finding cards. Sprint 3: Intent Lock with suggested fixes, review queue, comments, approvals and version history.	A text post and an image go from draft to approved, showing at least one finding of each type
+Round 3: Complete product and demo	Depth, trust and polish	Rulebook Compiler (guideline PDF to proposed rules). DOCX and PDF input. Meaning check and suggestion quality. Rule Health and recurring-mistakes dashboards. PDF approval record. Golden-set measurement and tuning. Deployment, demo script and rehearsal.	Live demo of all Must features on the deployed app, with measured results ready to present
+Why this scope is achievable
+•	Only three features depend on AI (tone, claim support, suggestions). Everything else is standard code with exact, testable behaviour.
+•	Managed services (Supabase, Vercel, Render) remove the need to build login, storage or servers.
+•	Each Must feature is a thin slice, and every AI feature has a rules-only fallback.
+•	Setup screens accept manual entry and CSV import, so the demo never depends on the Rulebook Compiler working perfectly.
+What we will not build
+•	Direct publishing to social platforms or content management systems
+•	Video and audio review, other than a transcript pasted as text
+•	Training our own AI model
+•	Languages other than English, a mobile app, and single sign-on
+Risks and fallbacks
+Risk	Fallback
+AI returns wrong or invented findings	Fixed JSON format, verbatim-evidence rule, golden-set measurement; switch that check to rules-only if it stays unreliable
+Rulebook Compiler produces poor rules from messy PDFs	A manager edits every rule anyway; manual entry and CSV import always work
+AI cost or rate limits	Cache results for unchanged content, use a small model, offer rules-only mode
+Image and OCR accuracy is limited	Limit image checks to palette, contrast, resolution and alt text; logo detection stays a Could
+The team falls behind	Cut in this order: Could, then Should, then the polish items in Round 3
+Unfamiliar tools slow us down	Round 1 test with FastAPI and Supabase; follow official tutorials; keep code simple
+9. Expected impact
+BrandProof moves brand checking from after publication to before it, which reduces avoidable errors, lowers reviewer workload and cuts the risk of a damaging public mistake.
+Who	Expected impact
+Creators	Learn the rules while they write, rewrite less, and keep control of their message through the Intent Lock
+Reviewers	See only flagged items with the source attached, and stop re-checking the same claims
+Brand managers	Get evidence of what goes wrong and where the guidelines are unclear, and make consistent decisions
+The organisation	Publishes fewer incorrect or outdated claims, keeps an auditable approval record, and can use AI writing tools and outside agencies more safely
+How we will measure it in the demo
+We will test BrandProof on our golden set of 40 to 50 sample drafts with known issues and report the results as they are, including the misses.
+•	Detection: the share of known issues that BrandProof catches. Our target is at least 80%.
+•	Precision: the share of flagged findings that are valid. Our target is at least 80%.
+•	Explainability: the share of findings that cite a rule or an approved fact. Our target is 100%.
+•	Review time: minutes to review the same sample drafts by hand and with BrandProof, timed side by side.
+10. Future scope after the event
+After the event, BrandProof can grow from a pre-publication checker into a brand-governance layer that sits inside the tools people already use.
+Near term: meet creators where they work
+•	Plug-ins for Google Docs, Word, Slack or Teams, Figma and common website content management systems
+•	A browser extension that checks copy in any editor before it is posted
+•	Slides, video transcripts and audio, and Indian languages alongside English
+Medium term: make the system smarter and safer to change
+•	A rule sandbox: replay a proposed rule change on past content to see its effect before approving it
+•	Facts connected to their source, such as a product database or pricing page, so facts update at the source and alert owners
+•	Stronger visual checks for logo misuse, layout and typography, and reusable brand templates
+•	Tuning of rule priorities and tone examples from past reviewer decisions, always approved by a human first
+Long term: enterprise scale
+•	Single sign-on, detailed audit exports, and private-cloud deployment with locally hosted models for organisations with strict data rules
+•	Multiple brands and regional rule variants in one workspace
+•	Monitoring of already published pages and campaigns for outdated claims
+•	A guided portal for onboarding external agencies
+
+11. Team and participant details
+Team name: jnanaranjanmajhi82 
+Project: BrandProof · Problem statement: Inkloom AI, intelligent brand governance · Team size: 3
+Participant	Team role	College or organisation	Degree and passing year	Email / Phone number
+Jnanaranjan Majhi	Team leader; product and AI engine lead (primary contact)	C.V Raman Global University 	B.Tech (CSE), 2026	jnanaranjanmajhi82@gmail.com (+91 81178 24928)
+
+Anupam Pujari	Backend and data lead	C.V Raman Global University	B.Tech (CSE), 2026	pujarianupam253@gmail.com
+Jyoti Patra	Frontend and experience lead	C.V Raman Global University	B.Tech (CSE), 2026	jyotipatra0828@gmail.com
+
+ 

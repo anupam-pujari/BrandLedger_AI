@@ -117,21 +117,45 @@ class DataStore:
         try:
             if (DATA_DIR / "sample_rules.json").exists():
                 with open(DATA_DIR / "sample_rules.json", "r", encoding="utf-8") as f:
-                    for item in json.load(f):
+                    for idx, item in enumerate(json.load(f)):
                         item["org_id"] = org_id
-                        self.rules[item["id"]] = item
+                        rid = item.get("id") or f"rule-{item.get('rule_code', f'r-{idx+1}')}"
+                        item["id"] = rid
+                        self.rules[rid] = item
 
             if (DATA_DIR / "sample_facts.json").exists():
                 with open(DATA_DIR / "sample_facts.json", "r", encoding="utf-8") as f:
-                    for item in json.load(f):
+                    for idx, item in enumerate(json.load(f)):
                         item["org_id"] = org_id
-                        self.facts[item["id"]] = item
+                        fid = item.get("id") or f"fact-{item.get('fact_code', f'f-{idx+1}')}"
+                        item["id"] = fid
+                        if "claim_text" not in item:
+                            item["claim_text"] = item.get("content", "")
+                        self.facts[fid] = item
 
             if (DATA_DIR / "sample_terms.json").exists():
                 with open(DATA_DIR / "sample_terms.json", "r", encoding="utf-8") as f:
+                    t_idx = 1
                     for item in json.load(f):
-                        item["org_id"] = org_id
-                        self.terms[item["id"]] = item
+                        pref = item.get("preferred_term", "")
+                        banned_list = item.get("banned_alternatives", [])
+                        notes = item.get("notes", "")
+                        case_sens = item.get("case_sensitive", False)
+
+                        for b in banned_list:
+                            tid = f"trm-{t_idx}"
+                            self.terms[tid] = {
+                                "id": tid,
+                                "org_id": org_id,
+                                "term": b,
+                                "term_type": "banned",
+                                "preferred_replacement": pref,
+                                "case_sensitive": case_sens,
+                                "notes": notes,
+                                "created_at": datetime.now(timezone.utc).isoformat(),
+                            }
+                            t_idx += 1
+
 
             if (DATA_DIR / "sample_brand_palette.json").exists():
                 with open(DATA_DIR / "sample_brand_palette.json", "r", encoding="utf-8") as f:

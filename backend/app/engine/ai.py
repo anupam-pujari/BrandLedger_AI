@@ -68,6 +68,13 @@ class MaskingService:
         return cls.mask_text(text)
 
     @classmethod
+    def unmask_text(cls, text: str, mapping: Dict[str, str]) -> str:
+        """Restores original values from masked placeholders using the mapping."""
+        for placeholder, original in mapping.items():
+            text = text.replace(placeholder, original)
+        return text
+
+    @classmethod
     def unmask(cls, text: str, mapping: Dict[str, str]) -> str:
         return cls.unmask_text(text, mapping)
 
