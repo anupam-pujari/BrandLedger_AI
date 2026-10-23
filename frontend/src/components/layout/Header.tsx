@@ -21,12 +21,13 @@ export const Header: React.FC = () => {
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
 
   useEffect(() => {
-    fetch('http://localhost:8000/health')
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+    fetch(`${apiUrl}/health`)
       .then(r => r.ok ? setBackendOnline(true) : setBackendOnline(false))
       .catch(() => setBackendOnline(false));
     
     const interval = setInterval(() => {
-      fetch('http://localhost:8000/health')
+      fetch(`${apiUrl}/health`)
         .then(r => r.ok ? setBackendOnline(true) : setBackendOnline(false))
         .catch(() => setBackendOnline(false));
     }, 15000);

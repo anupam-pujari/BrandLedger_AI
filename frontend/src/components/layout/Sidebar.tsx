@@ -164,7 +164,7 @@ export const Sidebar: React.FC = () => {
       {/* Footer Info Box */}
       <div className="p-4 border-t border-slate-800 bg-slate-950/60">
         <a
-          href="http://localhost:8000/docs"
+          href={`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/docs`}
           target="_blank"
           rel="noreferrer"
           className="flex items-center justify-between text-[11px] text-slate-400 hover:text-indigo-400 transition"
