@@ -74,6 +74,7 @@ export const FactsPage: React.FC = () => {
         source_document: newFact.source_document,
         valid_until: newFact.valid_until,
         tags: newFact.tags.split(',').map(t => t.trim()),
+        status: 'active',
         is_expired: false,
       };
       setFacts(prev => [createdFact, ...prev]);

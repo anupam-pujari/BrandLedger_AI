@@ -47,6 +47,7 @@ export interface Fact {
   id: string;
   org_id: string;
   fact_code: string;
+  category?: string;
   content: string;
   owner_name: string;
   owner_email: string;
