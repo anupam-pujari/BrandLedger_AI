@@ -33,28 +33,28 @@ export const DiffViewer: React.FC<DiffViewerProps> = ({
   }, [diffs]);
 
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden">
-      <div className="px-4 py-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between text-xs">
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900 overflow-hidden shadow-xs">
+      <div className="px-5 py-3.5 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-white">Version Diff</span>
-          <span className="text-slate-400">
+          <span className="font-semibold text-slate-900 dark:text-white">Version Diff</span>
+          <span className="text-slate-500 dark:text-slate-400">
             Comparing <strong>v{v1Number}</strong> → <strong>v{v2Number}</strong>
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-emerald-400 font-mono">+{stats.additions} chars</span>
-          <span className="text-rose-400 font-mono">-{stats.deletions} chars</span>
+          <span className="text-emerald-600 dark:text-emerald-400 font-mono font-semibold">+{stats.additions} chars</span>
+          <span className="text-rose-600 dark:text-rose-400 font-mono font-semibold">-{stats.deletions} chars</span>
         </div>
       </div>
 
-      <div className="p-4 font-mono text-sm leading-relaxed whitespace-pre-wrap select-text bg-slate-900/90 text-slate-200 min-h-[160px]">
+      <div className="p-5 font-mono text-sm leading-relaxed whitespace-pre-wrap select-text bg-white dark:bg-slate-900/90 text-slate-900 dark:text-slate-200 min-h-[160px]">
         {diffs.map(([operation, text], index) => {
           if (operation === 1) {
             // Addition
             return (
               <span
                 key={index}
-                className="bg-emerald-950 text-emerald-300 px-1 py-0.5 rounded font-semibold border-b-2 border-emerald-500"
+                className="bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-300 px-1 py-0.5 rounded font-semibold border-b-2 border-emerald-500"
               >
                 {text}
               </span>
@@ -65,7 +65,7 @@ export const DiffViewer: React.FC<DiffViewerProps> = ({
             return (
               <span
                 key={index}
-                className="bg-rose-950/80 text-rose-300 px-1 py-0.5 rounded line-through opacity-80"
+                className="bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 px-1 py-0.5 rounded line-through opacity-80"
               >
                 {text}
               </span>

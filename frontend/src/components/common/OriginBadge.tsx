@@ -11,10 +11,10 @@ export const OriginBadge: React.FC<OriginBadgeProps> = ({ checkType, className =
   if (checkType === 'rule' || checkType === 'rule_check') {
     return (
       <span
-        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gradient-to-r from-purple-500/15 to-indigo-500/15 text-purple-300 border border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.2)] font-['Outfit'] ${className}`}
+        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30 font-['Outfit'] ${className}`}
         title="Deterministic exact match from regex or rulebook code (<15ms)"
       >
-        <Code2 className="w-3.5 h-3.5 text-purple-400" />
+        <Code2 className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
         <span>Rule check</span>
       </span>
     );

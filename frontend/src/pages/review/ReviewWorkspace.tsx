@@ -178,11 +178,11 @@ export const ReviewWorkspace: React.FC = () => {
             <ArrowLeft className="w-4 h-4 text-cyan-400" />
           </Link>
           <div>
-            <h1 className="text-2xl font-black text-white flex items-center gap-2 font-['Outfit']">
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2 font-['Outfit']">
               <span>Review Draft:</span>
               <span className="text-gradient-vibrant">{content?.title || 'Draft Submission'}</span>
             </h1>
-            <p className="text-xs text-slate-400 mt-0.5 font-mono">
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 font-mono">
               Author: {content?.author_id?.slice(0, 8)}... · Version {content?.current_version?.version_number || 1}
             </p>
           </div>
@@ -192,9 +192,9 @@ export const ReviewWorkspace: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowChangesModal(true)}
-            className="flex items-center gap-1.5 px-4 py-2 bg-white/[0.04] hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:border-amber-400/60 rounded-xl text-xs font-bold transition-all shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-2 bg-white dark:bg-white/[0.04] hover:bg-amber-50 dark:hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-500/30 hover:border-amber-400 rounded-xl text-xs font-bold transition-all shadow-xs"
           >
-            <XCircle className="w-3.5 h-3.5 text-amber-400" />
+            <XCircle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
             <span>Request Changes</span>
           </button>
 
@@ -203,14 +203,14 @@ export const ReviewWorkspace: React.FC = () => {
             <button
               onClick={handleApprove}
               disabled={isSubmitting || content?.status === 'approved'}
-              className="flex items-center gap-1.5 px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-all transform hover:-translate-y-0.5"
+              className="flex items-center gap-1.5 px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-md transition-all transform hover:-translate-y-0.5"
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>{content?.status === 'approved' ? 'Approved & Certified' : 'Approve & Sign-Off'}</span>
             </button>
           ) : (
-            <div className="px-3.5 py-2 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-300 flex items-center gap-1.5 font-medium shadow-[0_0_12px_rgba(244,63,94,0.15)]" title="Constitutional Rule FC1.3: Creator cannot approve own draft">
-              <Lock className="w-3.5 h-3.5 text-rose-400" />
+            <div className="px-3.5 py-2 bg-rose-100 dark:bg-rose-500/10 border border-rose-300 dark:border-rose-500/30 rounded-xl text-xs text-rose-800 dark:text-rose-300 flex items-center gap-1.5 font-semibold shadow-xs" title="Constitutional Rule FC1.3: Creator cannot approve own draft">
+              <Lock className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
               <span>Self-Approval Restricted (FC1.3)</span>
             </div>
           )}
@@ -218,7 +218,7 @@ export const ReviewWorkspace: React.FC = () => {
           {content?.status === 'approved' && (
             <button
               onClick={handleDownloadPdf}
-              className="btn-gradient-primary flex items-center gap-1.5 px-4 py-2 text-white rounded-xl text-xs font-bold transition-all"
+              className="btn-gradient-primary flex items-center gap-1.5 px-4 py-2 text-white rounded-xl text-xs font-bold shadow-md transition-all"
               title="Download Certified Compliance Record"
             >
               <Download className="w-3.5 h-3.5" />
@@ -230,8 +230,8 @@ export const ReviewWorkspace: React.FC = () => {
 
       {/* FC1.3 Warning banner if author */}
       {isAuthor && (
-        <div className="p-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-xs text-amber-300 flex items-center gap-2.5 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
-          <AlertCircle className="w-4 h-4 shrink-0 text-amber-400" />
+        <div className="p-4 rounded-2xl border border-amber-300 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 text-xs text-amber-900 dark:text-amber-300 flex items-center gap-2.5 shadow-xs">
+          <AlertCircle className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
           <span className="leading-relaxed">
             <strong>Constitutional Safety Guard (FC1.3):</strong> You authored this draft. The &quot;Approve&quot; button is hidden to ensure impartial review. Switch persona in the top-right to <strong>Elena Rostova (Reviewer)</strong> or <strong>Sarah Lin (Brand Manager)</strong> to approve.
           </span>
@@ -242,39 +242,39 @@ export const ReviewWorkspace: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column (7 cols): Submitted Document Text */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="rounded-2xl border border-white/[0.08] glass-panel overflow-hidden shadow-2xl">
-            <div className="px-5 py-3.5 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between text-xs font-['Outfit']">
-              <span className="font-bold text-white flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-cyan-400" />
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-xs dark:shadow-2xl">
+            <div className="px-5 py-3.5 bg-slate-50 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs font-['Outfit']">
+              <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-cyan-500" />
                 Current Version Text (v{content?.current_version?.version_number || 1})
               </span>
-              <span className="text-cyan-400/80 uppercase font-mono text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20">
+              <span className="text-cyan-800 dark:text-cyan-400/80 uppercase font-mono text-[10px] px-2.5 py-0.5 rounded-full bg-cyan-100 dark:bg-cyan-500/10 border border-cyan-200 dark:border-cyan-500/20 font-semibold">
                 {content?.content_type} format
               </span>
             </div>
-            <div className="p-6 font-mono text-sm leading-relaxed text-slate-100 whitespace-pre-wrap bg-[#060814]/70">
+            <div className="p-6 font-mono text-sm leading-relaxed text-slate-900 dark:text-slate-100 whitespace-pre-wrap bg-slate-50/50 dark:bg-[#060814]/70">
               {content?.current_version?.body || 'No text content available.'}
             </div>
           </div>
 
           {/* Intent Lock verification metadata */}
-          <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/70 text-xs space-y-2">
-            <h4 className="font-semibold text-white flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+          <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/70 text-xs space-y-2 shadow-xs">
+            <h4 className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>Creator Intent Lock Parameters</span>
             </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-slate-300">
-              <div className="p-2 rounded bg-slate-950 border border-slate-800">
-                <span className="text-slate-500 block">Audience</span>
-                <strong>{content?.intent_audience || 'DevOps Leads'}</strong>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
+              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                <span className="text-slate-500 block mb-0.5">Audience</span>
+                <strong className="text-slate-900 dark:text-white font-semibold">{content?.intent_audience || 'DevOps Leads'}</strong>
               </div>
-              <div className="p-2 rounded bg-slate-950 border border-slate-800">
-                <span className="text-slate-500 block">Core Purpose</span>
-                <strong>{content?.intent_purpose || 'Launch'}</strong>
+              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                <span className="text-slate-500 block mb-0.5">Core Purpose</span>
+                <strong className="text-slate-900 dark:text-white font-semibold">{content?.intent_purpose || 'Launch'}</strong>
               </div>
-              <div className="p-2 rounded bg-slate-950 border border-slate-800">
-                <span className="text-slate-500 block">Key Message</span>
-                <strong>{content?.intent_key_message || 'Reliability'}</strong>
+              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                <span className="text-slate-500 block mb-0.5">Key Message</span>
+                <strong className="text-slate-900 dark:text-white font-semibold">{content?.intent_key_message || 'Reliability'}</strong>
               </div>
             </div>
           </div>
@@ -282,34 +282,34 @@ export const ReviewWorkspace: React.FC = () => {
 
         {/* Right Column (5 cols): Findings Audit Checklist */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="rounded-xl border border-slate-800 bg-slate-900 p-4 shadow-sm">
-            <h3 className="text-sm font-semibold text-white mb-2 flex items-center justify-between">
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900 p-5 shadow-xs">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-1.5 flex items-center justify-between">
               <span>Audit & Proof Checklist</span>
-              <span className="text-xs font-mono text-slate-400">
+              <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
                 {findings.length > 0 ? `${findings.length} findings verified` : 'Clean Pass'}
               </span>
             </h3>
-            <p className="text-xs text-slate-400 mb-4">
+            <p className="text-xs text-slate-600 dark:text-slate-400 mb-3.5">
               All findings have been reviewed against the approved Facts Vault and brand guideline rules.
             </p>
 
             {findings.length > 0 && (
-              <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 mb-2 bg-slate-950/60 p-2 rounded-lg border border-slate-800">
-                <span className="font-medium text-slate-300">Quick Shortcuts:</span>
-                <span className="font-mono text-slate-400 flex items-center gap-1.5">
-                  <span><kbd className="px-1.5 py-0.5 bg-slate-800 text-indigo-300 rounded border border-slate-700 font-bold">J</kbd> Next</span>
+              <div className="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400 px-3 py-2 mb-3 bg-slate-100 dark:bg-slate-950/60 rounded-xl border border-slate-200 dark:border-slate-800">
+                <span className="font-semibold text-slate-800 dark:text-slate-300">Quick Shortcuts:</span>
+                <span className="font-mono text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
+                  <span><kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 rounded border border-slate-300 dark:border-slate-700 font-bold">J</kbd> Next</span>
                   <span>·</span>
-                  <span><kbd className="px-1.5 py-0.5 bg-slate-800 text-indigo-300 rounded border border-slate-700 font-bold">K</kbd> Prev</span>
+                  <span><kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 rounded border border-slate-300 dark:border-slate-700 font-bold">K</kbd> Prev</span>
                 </span>
               </div>
             )}
 
             <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
               {findings.length === 0 ? (
-                <div className="p-6 rounded-lg bg-emerald-950/20 border border-emerald-900/30 text-center">
-                  <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
-                  <p className="text-xs font-semibold text-emerald-300">No Open Governance Findings</p>
-                  <p className="text-[11px] text-slate-400 mt-1">
+                <div className="p-6 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/30 text-center">
+                  <CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400 mx-auto mb-2" />
+                  <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">No Open Governance Findings</p>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-1">
                     All promotional claims and terminology match approved source facts.
                   </p>
                 </div>
@@ -339,14 +339,14 @@ export const ReviewWorkspace: React.FC = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
-              Feedback & Required Edits <span className="text-rose-400">*</span>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Feedback & Required Edits <span className="text-rose-500">*</span>
             </label>
             <textarea
               value={changeNotes}
               onChange={e => setChangeNotes(e.target.value)}
               placeholder="e.g. Please clarify the SLA claim in paragraph 2 and verify with legal..."
-              className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-white focus:outline-none focus:border-indigo-500"
+              className="w-full p-3 bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500"
               rows={4}
             />
           </div>
@@ -354,14 +354,14 @@ export const ReviewWorkspace: React.FC = () => {
           <div className="flex justify-end gap-2 pt-2">
             <button
               onClick={() => setShowChangesModal(false)}
-              className="px-3 py-1.5 text-xs text-slate-400 hover:text-white"
+              className="px-3.5 py-2 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
             >
               Cancel
             </button>
             <button
               onClick={handleRequestChanges}
               disabled={isSubmitting}
-              className="px-4 py-1.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold rounded-lg transition"
+              className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold rounded-xl shadow-xs transition"
             >
               Send Feedback to Creator
             </button>

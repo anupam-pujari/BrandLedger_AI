@@ -124,19 +124,19 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="space-y-8 animate-fade-in relative z-10">
       {/* Welcome Hero Banner with Dual Theme Multi-Color Mesh */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-sky-50 via-indigo-50/70 to-emerald-50/50 dark:from-indigo-950/80 dark:via-purple-950/40 dark:to-slate-950/80 border border-slate-200/80 dark:border-indigo-500/30 p-6 md:p-8 shadow-md dark:shadow-[0_0_40px_rgba(79,70,229,0.18)] backdrop-blur-xl">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-sky-50 via-slate-50 to-emerald-50/60 dark:from-[#0F172A] dark:via-[#131E32] dark:to-[#0D1524] border border-slate-200/80 dark:border-slate-800 p-6 md:p-8 shadow-sm dark:shadow-xl backdrop-blur-xl">
         {/* Decorative corner glow */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-cyan-400/20 via-sky-400/15 to-transparent dark:from-cyan-500/20 dark:via-violet-600/15 rounded-full blur-2xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-gradient-to-tr from-emerald-400/15 via-teal-400/10 to-transparent dark:from-pink-500/15 dark:via-indigo-600/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-sky-400/15 via-blue-500/10 to-transparent dark:from-sky-500/10 dark:via-blue-600/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-gradient-to-tr from-emerald-400/15 via-teal-400/10 to-transparent dark:from-emerald-500/10 dark:via-teal-600/10 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-sky-100/80 dark:bg-gradient-to-r dark:from-indigo-500/20 dark:via-purple-500/20 dark:to-cyan-500/20 text-sky-800 dark:text-cyan-200 border border-sky-300/80 dark:border-cyan-500/30 mb-4 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5 text-sky-600 dark:text-cyan-300 animate-spin-slow" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border border-sky-300 dark:border-sky-800 mb-4 shadow-sm">
+            <Sparkles className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 animate-spin-slow" />
             <span>Brand Governance Active · ApexCloud Enterprise</span>
           </div>
 
           <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight font-['Outfit']">
-            Welcome back, <span className="text-gradient-vibrant">{user?.fullName || 'Sarah'}</span>
+            Welcome back, <span className="text-sky-600 dark:text-sky-400">{user?.fullName || 'Sarah'}</span>
           </h1>
           <p className="mt-3 text-sm md:text-base text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
             Every promotional claim matches an approved fact, every finding cites its source guideline, and human judgement remains the final gate.
@@ -154,7 +154,7 @@ export const Dashboard: React.FC = () => {
             {(role === 'reviewer' || role === 'brand_manager' || role === 'admin') && (
               <Link
                 to="/review/queue"
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.08] text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white rounded-xl text-xs font-semibold border border-slate-200 dark:border-white/[0.12] hover:border-amber-500/40 backdrop-blur-md transition-all shadow-sm"
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800/90 hover:bg-slate-100 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 hover:border-amber-500/40 backdrop-blur-md transition-all shadow-sm"
               >
                 <ClipboardCheck className="w-4 h-4 text-amber-500" />
                 <span>Open Review Queue</span>
@@ -164,9 +164,9 @@ export const Dashboard: React.FC = () => {
             {(role === 'brand_manager' || role === 'admin') && (
               <Link
                 to="/source-of-truth/rules"
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-white/[0.04] hover:bg-slate-100 dark:hover:bg-white/[0.08] text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white rounded-xl text-xs font-semibold border border-slate-200 dark:border-white/[0.12] hover:border-indigo-500/40 backdrop-blur-md transition-all shadow-sm"
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800/90 hover:bg-slate-100 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 hover:border-blue-500/40 backdrop-blur-md transition-all shadow-sm"
               >
-                <BookOpen className="w-4 h-4 text-indigo-500" />
+                <BookOpen className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                 <span>Compile New Rules</span>
               </Link>
             )}
@@ -256,25 +256,25 @@ export const Dashboard: React.FC = () => {
             tabIndex={0}
             onClick={() => setActiveModal('rules')}
             onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setActiveModal('rules')}
-            className="p-5 rounded-2xl relative overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl bg-white/90 dark:bg-slate-900/60 border border-indigo-200 dark:border-indigo-500/20 hover:border-indigo-400 dark:hover:border-indigo-500/50 shadow-sm"
+            className="p-5 rounded-2xl relative overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl bg-white/90 dark:bg-slate-900/60 border border-blue-200 dark:border-blue-500/20 hover:border-blue-400 dark:hover:border-blue-500/50 shadow-sm"
           >
             <div className="flex items-center justify-between mb-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Active Rulebook
               </span>
-              <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.15)] group-hover:scale-110 transition-transform">
+              <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.15)] group-hover:scale-110 transition-transform">
                 <BookOpen className="w-4 h-4" />
               </div>
             </div>
             <div className="text-3xl font-extrabold text-slate-900 dark:text-white font-mono tracking-tight font-['Outfit']">
               {stats.active_rules_count}
             </div>
-            <div className="mt-2.5 flex items-center justify-between text-xs text-indigo-700 dark:text-indigo-300/90 font-medium">
+            <div className="mt-2.5 flex items-center justify-between text-xs text-blue-700 dark:text-blue-300/90 font-medium">
               <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                 <span>Compiled with AST citations</span>
               </div>
-              <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
+              <span className="text-[11px] text-blue-600 dark:text-blue-400 font-medium group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
                 Inspect <ChevronRight className="w-3 h-3" />
               </span>
             </div>
@@ -396,9 +396,9 @@ export const Dashboard: React.FC = () => {
           </h3>
 
           <div className="space-y-2.5 text-xs">
-            <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-white/[0.03] border border-indigo-200/60 dark:border-indigo-500/20 hover:border-indigo-400 dark:hover:border-indigo-500/40 transition-colors">
-              <div className="font-bold text-indigo-700 dark:text-indigo-300 mb-0.5 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+            <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-white/[0.03] border border-blue-200/60 dark:border-blue-500/20 hover:border-blue-400 dark:hover:border-blue-500/40 transition-colors">
+              <div className="font-bold text-blue-700 dark:text-blue-300 mb-0.5 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                 1. Rulebook Compiler
               </div>
               <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
@@ -436,9 +436,9 @@ export const Dashboard: React.FC = () => {
               </p>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-white/[0.03] border border-purple-200/60 dark:border-purple-500/20 hover:border-purple-400 dark:hover:border-purple-500/40 transition-colors">
-              <div className="font-bold text-purple-700 dark:text-purple-300 mb-0.5 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+            <div className="p-3 rounded-xl bg-slate-50/70 dark:bg-white/[0.03] border border-rose-200/60 dark:border-rose-500/20 hover:border-rose-400 dark:hover:border-rose-500/40 transition-colors">
+              <div className="font-bold text-rose-700 dark:text-rose-300 mb-0.5 flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                 5. Rule Health Insights
               </div>
               <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
@@ -478,11 +478,11 @@ export const Dashboard: React.FC = () => {
                 {Math.round(stats.approval_rate * 100)}%
               </span>
             </div>
-            <div className="p-3.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-center">
-              <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block">
+            <div className="p-3.5 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 text-center">
+              <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">
                 Approved Items
               </span>
-              <span className="text-2xl font-black text-indigo-700 dark:text-indigo-300 font-mono mt-0.5 block">
+              <span className="text-2xl font-black text-blue-700 dark:text-blue-300 font-mono mt-0.5 block">
                 {stats.approved_content_items}
               </span>
             </div>
@@ -635,10 +635,10 @@ export const Dashboard: React.FC = () => {
               <div>
                 <div className="flex justify-between font-medium mb-1">
                   <span className="text-slate-700 dark:text-slate-300">Brand Voice &amp; Tone Calibration</span>
-                  <span className="font-bold text-indigo-600 dark:text-indigo-400">18% (4 issues)</span>
+                  <span className="font-bold text-blue-600 dark:text-blue-400">18% (4 issues)</span>
                 </div>
                 <div className="w-full bg-slate-200 dark:bg-white/[0.08] h-2 rounded-full overflow-hidden">
-                  <div className="bg-indigo-500 h-full rounded-full" style={{ width: '18%' }} />
+                  <div className="bg-blue-500 h-full rounded-full" style={{ width: '18%' }} />
                 </div>
               </div>
 
@@ -686,10 +686,10 @@ export const Dashboard: React.FC = () => {
       >
         <div className="space-y-5">
           {/* Top Engine Banner */}
-          <div className="p-4 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/30 flex items-start gap-3">
-            <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
+          <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 flex items-start gap-3">
+            <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
             <div>
-              <h4 className="text-xs font-bold text-indigo-900 dark:text-indigo-200">
+              <h4 className="text-xs font-bold text-blue-900 dark:text-blue-200">
                 16 Compiled Rules Operating with Page Citations
               </h4>
               <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
@@ -701,7 +701,7 @@ export const Dashboard: React.FC = () => {
           {/* Rules Category Quick Summary */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
             <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-white/[0.08] text-center">
-              <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 block uppercase">Tone &amp; Voice</span>
+              <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 block uppercase">Tone &amp; Voice</span>
               <span className="text-lg font-black text-slate-900 dark:text-white font-mono mt-0.5 block">5 Rules</span>
             </div>
             <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-white/[0.08] text-center">
@@ -736,7 +736,7 @@ export const Dashboard: React.FC = () => {
                 >
                   <div>
                     <span className="text-xs font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
-                      <span className="font-mono text-[11px] text-indigo-600 dark:text-indigo-400 font-bold">{r.rule_code}</span>
+                      <span className="font-mono text-[11px] text-blue-600 dark:text-blue-400 font-bold">{r.rule_code}</span>
                       <span>·</span>
                       <span>{r.title}</span>
                     </span>
@@ -744,7 +744,7 @@ export const Dashboard: React.FC = () => {
                       Category: {r.category} · Severity: {r.severity}
                     </span>
                   </div>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/20">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-500/20">
                     AST Active
                   </span>
                 </div>

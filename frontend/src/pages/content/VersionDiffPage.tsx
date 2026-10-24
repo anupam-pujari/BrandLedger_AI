@@ -44,27 +44,27 @@ Learn more by visiting [Explore ApexCloud Infrastructure Specs](https://apexclou
 
   return (
     <div className="space-y-6 animate-fade-in pb-12">
-      <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+      <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-3">
           <Link
             to={id ? `/content/${id}` : '/content/mine'}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition"
+            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2">
-              <GitCompare className="w-5 h-5 text-indigo-400" />
+            <h1 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <GitCompare className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               <span>Version History & Semantic Diff</span>
             </h1>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
               Review line-by-line editorial and governance revisions across version cycles.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
-          <span className="px-2 py-1 rounded bg-slate-800 border border-slate-700">
+        <div className="flex items-center gap-2 text-xs font-mono">
+          <span className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-semibold shadow-xs">
             Document: {content?.title || 'Launch Announcement'}
           </span>
         </div>
@@ -80,20 +80,20 @@ Learn more by visiting [Explore ApexCloud Infrastructure Specs](https://apexclou
         />
 
         {/* Change Rationale Legend */}
-        <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/60 text-xs">
-          <h4 className="font-semibold text-white mb-2 flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+        <div className="p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/60 text-xs shadow-xs">
+          <h4 className="font-semibold text-slate-900 dark:text-white mb-2.5 flex items-center gap-1.5">
+            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>Governance Revision Summary</span>
           </h4>
-          <ul className="space-y-1.5 text-slate-300 list-disc list-inside">
+          <ul className="space-y-2 text-slate-700 dark:text-slate-300 list-disc list-inside">
             <li>
-              Replaced banned guarantee keyword <code className="text-rose-400">guaranteed 100% uptime</code> with SLA-bounded statement per <strong>Rule R-21</strong>.
+              Replaced banned guarantee keyword <code className="text-rose-700 dark:text-rose-400 font-semibold bg-rose-50 dark:bg-rose-950/40 px-1 py-0.5 rounded">guaranteed 100% uptime</code> with SLA-bounded statement per <strong>Rule R-21</strong>.
             </li>
             <li>
-              Corrected outdated telemetry claim from <code className="text-rose-400">60%</code> to approved vault benchmark <code className="text-emerald-400">45%</code> per <strong>Fact F-07</strong>.
+              Corrected outdated telemetry claim from <code className="text-rose-700 dark:text-rose-400 font-semibold bg-rose-50 dark:bg-rose-950/40 px-1 py-0.5 rounded">60%</code> to approved vault benchmark <code className="text-emerald-700 dark:text-emerald-400 font-semibold bg-emerald-50 dark:bg-emerald-950/40 px-1 py-0.5 rounded">45%</code> per <strong>Fact F-07</strong>.
             </li>
             <li>
-              Updated non-descriptive anchor <code className="text-rose-400">[click here]</code> to descriptive label per <strong>WCAG 2.1 AA (Rule A-03)</strong>.
+              Updated non-descriptive anchor <code className="text-rose-700 dark:text-rose-400 font-semibold bg-rose-50 dark:bg-rose-950/40 px-1 py-0.5 rounded">[click here]</code> to descriptive label per <strong>WCAG 2.1 AA (Rule A-03)</strong>.
             </li>
           </ul>
         </div>

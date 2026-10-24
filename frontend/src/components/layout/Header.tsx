@@ -1,5 +1,6 @@
 // src/components/layout/Header.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth, DEMO_ACCOUNTS } from '../../context/AuthContext';
 import { useUI } from '../../context/UIContext';
 import { UserRole } from '../../types';
@@ -12,15 +13,87 @@ import {
   ShieldCheck,
   Sun,
   Moon,
-  PanelLeftClose,
-  PanelLeftOpen
+  CheckCheck,
+  CheckCircle2,
+  AlertTriangle,
+  Info,
+  Trash2,
+  ExternalLink
 } from 'lucide-react';
+
+interface GovernanceNotification {
+  id: string;
+  title: string;
+  description: string;
+  time: string;
+  read: boolean;
+  type: 'warning' | 'info' | 'alert' | 'success';
+  link?: string;
+}
+
+const INITIAL_NOTIFICATIONS: GovernanceNotification[] = [
+  {
+    id: 'n1',
+    title: 'Claim Renewal Notice',
+    description: 'Fact F-07 ("Zero packet loss guarantee") requires annual telemetry proof renewal.',
+    time: '10m ago',
+    read: false,
+    type: 'warning',
+    link: '/source-of-truth/facts',
+  },
+  {
+    id: 'n2',
+    title: 'Draft Awaiting Review',
+    description: 'Marcus Vance submitted "Q3 Enterprise Cloud Launch" for formal proof audit.',
+    time: '25m ago',
+    read: false,
+    type: 'info',
+    link: '/review/queue',
+  },
+  {
+    id: 'n3',
+    title: 'Ambiguous Rule Proposal',
+    description: 'Rule R-14 has a 56% creator dispute rate. Clarifying wording ready for approval.',
+    time: '1h ago',
+    read: false,
+    type: 'alert',
+    link: '/governance/rule-health',
+  },
+  {
+    id: 'n4',
+    title: 'AST Rule Compiled',
+    description: 'Guideline rule R-58 (Approved Palette Compliance) verified against Brand Guidelines PDF.',
+    time: '3h ago',
+    read: true,
+    type: 'success',
+    link: '/source-of-truth/rules',
+  },
+];
 
 export const Header: React.FC = () => {
   const { user, role, switchRole, org } = useAuth();
-  const { rulesOnlyMode, toggleRulesOnlyMode, theme, toggleTheme, isSidebarCollapsed, toggleSidebar } = useUI();
+  const { rulesOnlyMode, toggleRulesOnlyMode, theme, toggleTheme, showToast } = useUI();
+  const navigate = useNavigate();
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<GovernanceNotification[]>(INITIAL_NOTIFICATIONS);
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
+
+  const notificationRef = useRef<HTMLDivElement>(null);
+  const roleDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (notificationRef.current && !notificationRef.current.contains(e.target as Node)) {
+        setShowNotifications(false);
+      }
+      if (roleDropdownRef.current && !roleDropdownRef.current.contains(e.target as Node)) {
+        setShowRoleDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
@@ -35,6 +108,42 @@ export const Header: React.FC = () => {
     }, 15000);
     return () => clearInterval(interval);
   }, []);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const markAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    showToast('All notifications marked as read', 'info');
+  };
+
+  const clearAllNotifications = () => {
+    setNotifications([]);
+    showToast('Notifications cleared', 'info');
+  };
+
+  const handleNotificationClick = (item: GovernanceNotification) => {
+    setNotifications(prev =>
+      prev.map(n => (n.id === item.id ? { ...n, read: true } : n))
+    );
+    if (item.link) {
+      navigate(item.link);
+      setShowNotifications(false);
+    }
+  };
+
+  const getNotificationIcon = (type: GovernanceNotification['type']) => {
+    switch (type) {
+      case 'warning':
+        return <AlertTriangle className="w-4 h-4 text-amber-500" />;
+      case 'alert':
+        return <Sparkles className="w-4 h-4 text-rose-500" />;
+      case 'success':
+        return <CheckCircle2 className="w-4 h-4 text-emerald-500" />;
+      case 'info':
+      default:
+        return <Info className="w-4 h-4 text-cyan-500" />;
+    }
+  };
 
   const getRoleBadge = (r: UserRole) => {
     switch (r) {
@@ -66,21 +175,9 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="h-16 px-4 md:px-6 bg-white/80 dark:bg-[#080c20]/80 border-b border-slate-200/80 dark:border-white/[0.08] flex items-center justify-between sticky top-0 z-30 backdrop-blur-2xl transition-colors duration-200">
-      {/* Left section: Sidebar toggle & Workspace Tag */}
+    <header className="h-16 px-4 md:px-6 bg-white/80 dark:bg-[#0E1320]/95 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between sticky top-0 z-30 backdrop-blur-2xl transition-colors duration-200">
+      {/* Left section: Workspace Tag */}
       <div className="flex items-center gap-3">
-        <button
-          onClick={toggleSidebar}
-          className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors"
-          title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {isSidebarCollapsed ? (
-            <PanelLeftOpen className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
-          ) : (
-            <PanelLeftClose className="w-5 h-5" />
-          )}
-        </button>
-
         <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08]">
           <span className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
@@ -140,20 +237,111 @@ export const Header: React.FC = () => {
           <span className="hidden sm:inline">{rulesOnlyMode ? 'Rules-Only: ON' : 'AI Review: Active'}</span>
         </button>
 
-        {/* Notifications trigger */}
-        <button
-          className="relative p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-slate-100 dark:bg-white/[0.04] hover:bg-slate-200 dark:hover:bg-white/[0.08] border border-slate-200 dark:border-white/[0.06] transition-all"
-          aria-label="View notifications"
-          title="Notifications"
-        >
-          <Bell className="w-4 h-4" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_8px_#06b6d4]" />
-        </button>
+        {/* Interactive Notifications Trigger & Dropdown */}
+        <div className="relative" ref={notificationRef}>
+          <button
+            onClick={() => {
+              setShowNotifications(!showNotifications);
+              setShowRoleDropdown(false);
+            }}
+            className="relative p-2 rounded-xl text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-slate-200 dark:border-white/[0.06] transition-all"
+            aria-label="View notifications"
+            title={unreadCount > 0 ? `${unreadCount} unread governance notifications` : 'Notifications'}
+          >
+            <Bell className="w-4 h-4" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-[#0E1320] animate-pulse">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+
+          {/* Interactive Notifications Dropdown Drawer */}
+          {showNotifications && (
+            <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl p-3.5 z-50 animate-scale-up border border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-[#0F172A] shadow-2xl backdrop-blur-2xl">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm text-slate-900 dark:text-white font-['Outfit']">Governance Alerts</span>
+                  {unreadCount > 0 ? (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-300 dark:border-rose-500/30">
+                      {unreadCount} unread
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/30">
+                      All caught up
+                    </span>
+                  )}
+                </div>
+                {unreadCount > 0 && (
+                  <button
+                    onClick={markAllAsRead}
+                    className="flex items-center gap-1 text-[11px] font-semibold text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors"
+                  >
+                    <CheckCheck className="w-3.5 h-3.5" />
+                    <span>Mark all read</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Notification items list */}
+              <div className="divide-y divide-slate-100 dark:divide-slate-800/80 max-h-80 overflow-y-auto my-1 pr-1">
+                {notifications.length === 0 ? (
+                  <div className="py-8 text-center text-xs text-slate-500 dark:text-slate-400">
+                    No active notifications
+                  </div>
+                ) : (
+                  notifications.map(item => (
+                    <div
+                      key={item.id}
+                      onClick={() => handleNotificationClick(item)}
+                      className={`p-2.5 rounded-xl transition-all cursor-pointer flex items-start gap-3 my-1 ${
+                        !item.read
+                          ? 'bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800'
+                          : 'hover:bg-slate-50 dark:hover:bg-slate-800/30 opacity-75 hover:opacity-100'
+                      }`}
+                    >
+                      <div className="shrink-0 mt-0.5">{getNotificationIcon(item.type)}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-1 mb-0.5">
+                          <span className="text-xs font-bold text-slate-900 dark:text-white truncate font-['Outfit']">
+                            {item.title}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono shrink-0">{item.time}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug line-clamp-2">
+                          {item.description}
+                        </p>
+                      </div>
+                      {!item.read && (
+                        <span className="w-2 h-2 rounded-full bg-cyan-500 shrink-0 mt-1.5" />
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="pt-2.5 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px]">
+                <span className="text-slate-400 font-mono">Proof Engine v2.4</span>
+                <button
+                  onClick={clearAllNotifications}
+                  className="text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1"
+                >
+                  <Trash2 className="w-3 h-3" />
+                  <span>Clear list</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Quick Demo Persona / Role Switcher */}
-        <div className="relative">
+        <div className="relative" ref={roleDropdownRef}>
           <button
-            onClick={() => setShowRoleDropdown(!showRoleDropdown)}
+            onClick={() => {
+              setShowRoleDropdown(!showRoleDropdown);
+              setShowNotifications(false);
+            }}
             className="flex items-center gap-2 p-1.5 pr-2.5 rounded-full bg-slate-100 dark:bg-white/[0.04] hover:bg-slate-200 dark:hover:bg-white/[0.08] border border-slate-200 dark:border-white/[0.10] transition-all shadow-sm"
             aria-expanded={showRoleDropdown}
           >
@@ -174,8 +362,8 @@ export const Header: React.FC = () => {
 
           {/* Role selector dropdown */}
           {showRoleDropdown && (
-            <div className="absolute right-0 mt-2 w-80 glass-dropdown rounded-2xl p-2.5 z-50 animate-scale-up border border-slate-200 dark:border-white/[0.12] shadow-2xl">
-              <div className="px-3 py-2 border-b border-slate-200 dark:border-white/[0.08] mb-2">
+            <div className="absolute right-0 mt-2 w-80 rounded-2xl p-2.5 z-50 animate-scale-up border border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-[#0F172A] shadow-2xl backdrop-blur-2xl">
+              <div className="px-3 py-2 border-b border-slate-200 dark:border-slate-800 mb-2">
                 <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5 font-['Outfit']">
                   <ShieldCheck className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
                   <span>Switch Role (Interactive Demo)</span>
@@ -215,3 +403,4 @@ export const Header: React.FC = () => {
     </header>
   );
 };
+
