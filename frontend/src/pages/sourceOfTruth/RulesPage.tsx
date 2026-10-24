@@ -127,55 +127,59 @@ export const RulesPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
         <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-indigo-400" />
-            <span>Rulebook & Rule Compiler</span>
+          <h1 className="text-2xl font-black text-white flex items-center gap-2.5 font-['Outfit']">
+            <BookOpen className="w-6 h-6 text-cyan-400" />
+            <span className="text-gradient-vibrant">Rulebook &amp; Rule Compiler</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-300 mt-1 font-medium">
             Turn guideline PDFs into structured, testable rules with citations. A human approves every rule before it is enforced.
           </p>
         </div>
 
         {/* Tab switchers */}
-        <div className="flex items-center p-1 bg-slate-900 border border-slate-800 rounded-lg text-xs font-medium">
+        <div className="flex items-center p-1.5 glass-panel rounded-2xl text-xs font-semibold">
           <button
             onClick={() => setActiveTab('active')}
-            className={`px-3 py-1.5 rounded-md transition ${
-              activeTab === 'active' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+            className={`px-4 py-2 rounded-xl transition-all ${
+              activeTab === 'active'
+                ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.35)]'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             Active Rules ({rules.length})
           </button>
           <button
             onClick={() => setActiveTab('compiler')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition ${
-              activeTab === 'compiler' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
+              activeTab === 'compiler'
+                ? 'bg-gradient-to-r from-indigo-600 to-cyan-600 text-white shadow-[0_0_15px_rgba(6,182,212,0.35)]'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
             <span>Rulebook Compiler</span>
             {proposedRules.length > 0 && (
-              <span className="w-2 h-2 rounded-full bg-amber-400" />
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
             )}
           </button>
         </div>
       </div>
 
       {activeTab === 'active' ? (
-        <div className="space-y-4">
+        <div className="space-y-5">
           {/* Category Filter Pills */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-            <Filter className="w-3.5 h-3.5 text-slate-500 mr-1" />
+            <Filter className="w-3.5 h-3.5 text-cyan-400 mr-1" />
             {['all', 'tone', 'terminology', 'claims', 'messaging', 'visual', 'accessibility'].map(cat => (
               <button
                 key={cat}
                 onClick={() => setCategoryFilter(cat)}
-                className={`px-3 py-1.5 rounded-lg capitalize font-medium transition ${
+                className={`px-3.5 py-1.5 rounded-xl capitalize font-semibold transition-all ${
                   categoryFilter === cat
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                    ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-[0_0_12px_rgba(99,102,241,0.3)]'
+                    : 'bg-white/[0.04] text-slate-400 hover:text-white border border-white/[0.08] hover:bg-white/[0.08]'
                 }`}
               >
                 {cat}
@@ -188,37 +192,37 @@ export const RulesPage: React.FC = () => {
             {filteredRules.map(rule => (
               <div
                 key={rule.id}
-                className="p-5 rounded-xl border border-slate-800 bg-slate-900/90 shadow-sm flex flex-col justify-between space-y-3"
+                className="glass-card p-6 rounded-2xl flex flex-col justify-between space-y-3.5 border border-white/[0.08] hover:border-indigo-500/40"
               >
                 <div>
-                  <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="flex items-center justify-between gap-2 mb-2.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono font-bold text-indigo-400 px-2 py-0.5 rounded bg-indigo-950/80 border border-indigo-800/80">
+                      <span className="text-xs font-mono font-bold text-cyan-300 px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 shadow-[0_0_8px_rgba(6,182,212,0.15)]">
                         {rule.rule_code}
                       </span>
                       <SeverityBadge severity={rule.severity} />
                     </div>
-                    <span className="text-[11px] capitalize text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
+                    <span className="text-[11px] capitalize text-slate-300 bg-white/[0.06] border border-white/[0.08] px-2.5 py-0.5 rounded-full font-medium">
                       {rule.category}
                     </span>
                   </div>
 
-                  <h3 className="text-sm font-semibold text-white mb-1">{rule.title}</h3>
-                  <p className="text-xs text-slate-300 leading-relaxed mb-3">{rule.description}</p>
+                  <h3 className="text-base font-bold text-white mb-1.5 font-['Outfit']">{rule.title}</h3>
+                  <p className="text-xs text-slate-300 leading-relaxed mb-3.5">{rule.description}</p>
 
                   {/* Examples */}
                   {(rule.good_example || rule.bad_example) && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono mb-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-[11px] font-mono mb-3.5">
                       {rule.bad_example && (
-                        <div className="p-2 rounded bg-rose-950/20 border border-rose-900/30 text-rose-300">
-                          <span className="text-[10px] text-rose-500 uppercase font-sans font-bold block mb-0.5">Bad Example</span>
-                          "{rule.bad_example}"
+                        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-300">
+                          <span className="text-[10px] text-rose-400 uppercase font-sans font-bold block mb-1">Bad Example</span>
+                          &quot;{rule.bad_example}&quot;
                         </div>
                       )}
                       {rule.good_example && (
-                        <div className="p-2 rounded bg-emerald-950/20 border border-emerald-900/30 text-emerald-300">
-                          <span className="text-[10px] text-emerald-500 uppercase font-sans font-bold block mb-0.5">Good Example</span>
-                          "{rule.good_example}"
+                        <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-300">
+                          <span className="text-[10px] text-emerald-400 uppercase font-sans font-bold block mb-1">Good Example</span>
+                          &quot;{rule.good_example}&quot;
                         </div>
                       )}
                     </div>
@@ -226,9 +230,9 @@ export const RulesPage: React.FC = () => {
 
                   {/* Citation */}
                   {rule.source_document && (
-                    <div className="text-[11px] text-slate-400 flex items-center gap-1.5 pt-2 border-t border-slate-800">
+                    <div className="text-[11px] text-slate-400 flex items-center gap-2 pt-2.5 border-t border-white/[0.06]">
                       <FileText className="w-3.5 h-3.5 text-indigo-400" />
-                      <span>Source: {rule.source_document} {rule.source_page ? `(Page ${rule.source_page})` : ''}</span>
+                      <span>Source: <strong className="text-slate-300">{rule.source_document}</strong> {rule.source_page ? `(Page ${rule.source_page})` : ''}</span>
                     </div>
                   )}
                 </div>
@@ -240,13 +244,15 @@ export const RulesPage: React.FC = () => {
         /* Rulebook Compiler Interface */
         <div className="space-y-6">
           {/* Upload Dropzone */}
-          <div className="p-8 rounded-2xl border-2 border-dashed border-indigo-900/60 bg-slate-900/60 text-center hover:border-indigo-600/80 transition">
-            <UploadCloud className="w-10 h-10 text-indigo-400 mx-auto mb-3" />
-            <h3 className="text-sm font-semibold text-white">Upload Guideline Document (PDF / DOCX)</h3>
-            <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
-              Our parser analyzes brand guidelines, maps them to page citations, and drafts actionable test rules for human sign-off.
+          <div className="p-10 rounded-3xl border-2 border-dashed border-indigo-500/40 bg-gradient-to-b from-indigo-950/30 via-purple-950/20 to-transparent text-center hover:border-cyan-400/60 transition-all shadow-[0_0_30px_rgba(99,102,241,0.15)]">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-violet-600 to-cyan-500 flex items-center justify-center text-white mx-auto mb-4 shadow-[0_0_20px_rgba(6,182,212,0.4)]">
+              <UploadCloud className="w-7 h-7" />
+            </div>
+            <h3 className="text-base font-bold text-white font-['Outfit']">Upload Guideline Document (PDF / DOCX)</h3>
+            <p className="text-xs text-slate-300 mt-1.5 max-w-md mx-auto leading-relaxed">
+              Our compiler parses guideline documents into AST candidate rules with page &amp; quote citations for human sign-off.
             </p>
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-3.5">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -257,17 +263,17 @@ export const RulesPage: React.FC = () => {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isCompiling}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-2"
+                className="px-4 py-2.5 bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.12] text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-2"
               >
-                <UploadCloud className="w-3.5 h-3.5 text-indigo-400" />
+                <UploadCloud className="w-4 h-4 text-cyan-400" />
                 <span>Upload PDF Document</span>
               </button>
               <button
                 onClick={handleSimulateCompiler}
                 disabled={isCompiling}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-2"
+                className="btn-gradient-primary px-5 py-2.5 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-lg transition-all flex items-center gap-2"
               >
-                <Sparkles className="w-3.5 h-3.5" />
+                <Sparkles className="w-4 h-4 text-cyan-200" />
                 <span>{isCompiling ? 'Extracting Rule Candidates...' : 'Simulate PDF Compilation (Brand_Guidelines_2026.pdf)'}</span>
               </button>
             </div>

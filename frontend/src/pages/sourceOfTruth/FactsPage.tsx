@@ -119,21 +119,21 @@ export const FactsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in pb-12">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
         <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <Database className="w-5 h-5 text-indigo-400" />
-            <span>Approved Facts Vault (Claim Passport)</span>
+          <h1 className="text-2xl font-black text-white flex items-center gap-2.5 font-['Outfit']">
+            <Database className="w-6 h-6 text-emerald-400" />
+            <span className="text-gradient-vibrant">Approved Facts &amp; Claim Passport Vault</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Every promotional assertion in content drafts must match an approved fact with an owner and expiry date.
+          <p className="text-xs text-slate-300 mt-1 font-medium">
+            Single Source of Truth for verified metrics, claims, and certifications. Every claim is attributed to an owner and expiration date.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold shadow-sm transition"
+            className="btn-gradient-primary flex items-center gap-2 px-5 py-2.5 text-white rounded-xl text-xs font-bold shadow-lg transition-all"
           >
             <Plus className="w-4 h-4" />
             <span>Add Approved Fact</span>
@@ -144,13 +144,13 @@ export const FactsPage: React.FC = () => {
       {/* Search and Filters */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-cyan-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search claims, codes, owners..."
-            className="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+            className="w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border border-white/[0.10] rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 font-medium"
           />
         </div>
 
@@ -159,10 +159,10 @@ export const FactsPage: React.FC = () => {
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`px-3 py-1.5 rounded-lg capitalize font-medium transition ${
+              className={`px-3.5 py-1.5 rounded-xl capitalize font-semibold transition-all ${
                 statusFilter === status
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-[0_0_12px_rgba(16,185,129,0.3)]'
+                  : 'bg-white/[0.04] text-slate-400 hover:text-white border border-white/[0.08] hover:bg-white/[0.08]'
               }`}
             >
               {status}
@@ -172,32 +172,34 @@ export const FactsPage: React.FC = () => {
       </div>
 
       {/* Facts Table */}
-      <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden shadow-sm">
+      <div className="rounded-2xl border border-white/[0.08] glass-panel overflow-hidden shadow-2xl">
         {loading ? (
           <div className="p-12 text-center text-xs text-slate-400">Loading approved facts...</div>
         ) : filteredFacts.length === 0 ? (
           <div className="p-12 text-center text-xs text-slate-400">No facts found matching your criteria.</div>
         ) : (
-          <div className="divide-y divide-slate-800">
+          <div className="divide-y divide-white/[0.06]">
             {filteredFacts.map(fact => (
-              <div key={fact.id} className="p-5 hover:bg-slate-800/40 transition space-y-2">
+              <div key={fact.id} className="p-5 hover:bg-white/[0.04] transition-all space-y-2.5">
                 <div className="flex items-center justify-between gap-3 flex-wrap">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono font-bold text-emerald-400 px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-800/80">
+                    <span className="text-xs font-mono font-bold text-emerald-300 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 shadow-[0_0_8px_rgba(16,185,129,0.15)]">
                       {fact.fact_code}
                     </span>
                     {getStatusBadge(fact)}
-                    <span className="text-[10px] text-slate-500 font-mono">384-d vector indexed</span>
+                    <span className="text-[10px] text-cyan-400/80 font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20">
+                      384-d vector indexed
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
-                    <Clock className="w-3.5 h-3.5 text-slate-500" />
-                    <span>Valid until: <strong>{fact.valid_until}</strong></span>
+                    <Clock className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Valid until: <strong className="text-slate-200">{fact.valid_until}</strong></span>
                   </div>
                 </div>
 
-                <p className="text-sm font-medium text-white leading-relaxed">
-                  "{fact.content || (fact as any).claim_text}"
+                <p className="text-sm font-semibold text-white leading-relaxed font-['Outfit']">
+                  &quot;{fact.content || (fact as any).claim_text}&quot;
                 </p>
 
                 <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 pt-1">

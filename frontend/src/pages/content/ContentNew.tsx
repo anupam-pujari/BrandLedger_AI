@@ -346,28 +346,28 @@ export const ContentNew: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       {/* Top Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
         <div>
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <span>Pre-Check Workspace</span>
-            <span className="text-xs px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">
-              Interactive Proof Rail
+          <h1 className="text-2xl font-black text-white flex items-center gap-2.5 font-['Outfit']">
+            <span className="text-gradient-vibrant">Pre-Check Studio</span>
+            <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-gradient-to-r from-indigo-500/20 to-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.2)] font-semibold font-mono">
+              Live Proof Rail
             </span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-300 mt-1 font-medium">
             Test and refine your content against approved rules and facts before submitting for formal review.
           </p>
         </div>
 
         {/* Demo Samples Selector */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-400 hidden md:inline">Load Sample:</span>
+          <span className="text-xs text-slate-400 font-semibold font-['Outfit'] hidden md:inline">Load Sample:</span>
           <div className="flex items-center gap-1.5">
             {SAMPLE_DEMO_DRAFTS.map((sample, idx) => (
               <button
                 key={idx}
                 onClick={() => handleLoadSample(sample)}
-                className="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition"
+                className="px-3 py-1.5 text-xs font-semibold bg-white/[0.04] hover:bg-indigo-600/30 text-slate-300 hover:text-white rounded-xl border border-white/[0.10] hover:border-indigo-500/40 transition-all shadow-sm"
                 title={sample.title}
               >
                 Draft {idx + 1}
@@ -395,41 +395,43 @@ export const ContentNew: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Pane (7 cols / ~60%): Document Editor */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden shadow-sm">
-            <div className="px-4 py-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+          <div className="rounded-2xl border border-white/[0.08] glass-panel overflow-hidden shadow-2xl">
+            <div className="px-5 py-3.5 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between">
               <input
                 type="text"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 placeholder="Content Title..."
-                className="bg-transparent font-semibold text-sm text-white focus:outline-none w-full"
+                className="bg-transparent font-bold text-base text-white focus:outline-none w-full font-['Outfit'] placeholder:text-slate-500"
               />
-              <span className="text-xs text-slate-500 font-mono">Markdown / Text</span>
+              <span className="text-[11px] text-cyan-400/80 font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20">
+                Markdown / Copy
+              </span>
             </div>
 
-            <div className="p-4">
+            <div className="p-5">
               <textarea
                 value={body}
                 onChange={e => setBody(e.target.value)}
                 rows={14}
                 placeholder="Draft promotional copy, launch release, documentation..."
-                className="w-full bg-transparent text-sm leading-relaxed text-slate-200 focus:outline-none font-mono resize-none selection:bg-indigo-500/30"
+                className="w-full bg-transparent text-sm leading-relaxed text-slate-100 focus:outline-none font-mono resize-none selection:bg-indigo-500/30"
               />
             </div>
 
             {/* Bottom editor action bar */}
-            <div className="px-4 py-3 bg-slate-950/80 border-t border-slate-800 flex items-center justify-between">
-              <div className="text-xs text-slate-400">
-                <span>{body.split(/\s+/).filter(Boolean).length} words</span>
-                <span className="mx-2">·</span>
-                <span>{body.length} characters</span>
+            <div className="px-5 py-3.5 bg-white/[0.02] border-t border-white/[0.08] flex items-center justify-between">
+              <div className="text-xs text-slate-400 font-mono flex items-center gap-2">
+                <span className="text-slate-300 font-semibold">{body.split(/\s+/).filter(Boolean).length}</span> words
+                <span className="text-slate-600">·</span>
+                <span className="text-slate-300 font-semibold">{body.length}</span> chars
               </div>
 
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleRunCheck}
                   disabled={isChecking || !body.trim()}
-                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold rounded-lg shadow-md shadow-indigo-600/20 transition"
+                  className="btn-gradient-primary flex items-center gap-2 px-5 py-2.5 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all"
                 >
                   <Play className={`w-3.5 h-3.5 ${isChecking ? 'animate-spin' : ''}`} />
                   <span>{isChecking ? 'Auditing with Proof Engine...' : 'Run Brand Pre-Check'}</span>
@@ -444,14 +446,14 @@ export const ContentNew: React.FC = () => {
 
         {/* Right Pane (5 cols / ~40%): Findings & Proof Rail */}
         <div className="lg:col-span-5 space-y-4 sticky top-20">
-          <div className="rounded-xl border border-slate-800 bg-slate-900 p-4 shadow-sm">
+          <div className="rounded-2xl border border-white/[0.08] glass-panel p-5 shadow-2xl">
             {/* Status Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+            <div className="flex items-center justify-between pb-3.5 border-b border-white/[0.08] mb-3.5">
               <div>
-                <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                  <span>Findings & Proof Rail</span>
+                <h3 className="text-sm font-bold text-white flex items-center gap-2 font-['Outfit']">
+                  <span>Findings &amp; Proof Rail</span>
                   {findings.length > 0 && (
-                    <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
+                    <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
                       {findings.length}
                     </span>
                   )}
@@ -462,18 +464,18 @@ export const ContentNew: React.FC = () => {
               {findings.length > 0 && (
                 <div className="flex items-center gap-1.5 text-xs font-mono">
                   {criticalCount > 0 && (
-                    <span className="px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800 font-bold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/40 shadow-[0_0_10px_rgba(244,63,94,0.2)] font-bold">
                       {criticalCount} Critical
                     </span>
                   )}
                   {warningCount > 0 && (
-                    <span className="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 font-bold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.2)] font-bold">
                       {warningCount} Warn
                     </span>
                   )}
                   {criticalCount === 0 && warningCount === 0 && (
-                    <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-bold flex items-center gap-1">
-                      <CheckCircle2 className="w-3 h-3" /> Clean
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.2)] font-bold flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Clean
                     </span>
                   )}
                 </div>
@@ -482,15 +484,15 @@ export const ContentNew: React.FC = () => {
 
             {/* Category Filter Pills */}
             {findings.length > 0 && (
-              <div className="flex flex-wrap gap-1 mb-4 text-[11px]">
+              <div className="flex flex-wrap gap-1.5 mb-4 text-[11px]">
                 {['all', 'claims', 'tone', 'terminology', 'a11y'].map(filter => (
                   <button
                     key={filter}
                     onClick={() => setActiveFilter(filter)}
-                    className={`px-2.5 py-1 rounded-md capitalize transition ${
+                    className={`px-3 py-1 rounded-xl capitalize font-semibold transition-all ${
                       activeFilter === filter
-                        ? 'bg-indigo-600 text-white font-semibold'
-                        : 'bg-slate-800 text-slate-400 hover:text-white'
+                        ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-[0_0_12px_rgba(99,102,241,0.35)]'
+                        : 'bg-white/[0.04] text-slate-400 hover:text-white border border-white/[0.06] hover:bg-white/[0.08]'
                     }`}
                   >
                     {filter === 'a11y' ? 'A11y & Visual' : filter}
@@ -499,18 +501,18 @@ export const ContentNew: React.FC = () => {
               </div>
             )}
 
-            {/* Reviewer Keyboard Navigation Banner (FC4.2) */}
+            {/* Reviewer Keyboard Navigation Banner */}
             {findings.length > 0 && (
-              <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 mb-2 bg-slate-950/60 p-2 rounded-lg border border-slate-800">
-                <span className="font-medium text-slate-300">Quick Shortcuts:</span>
+              <div className="flex items-center justify-between text-[11px] text-slate-400 px-3 py-2 mb-3 bg-[#060814]/80 rounded-xl border border-white/[0.08] shadow-inner">
+                <span className="font-semibold text-slate-300 font-['Outfit']">Shortcuts:</span>
                 <span className="font-mono text-slate-400 flex items-center gap-1.5">
-                  <span><kbd className="px-1.5 py-0.5 bg-slate-800 text-indigo-300 rounded border border-slate-700 font-bold">J</kbd> Next</span>
+                  <span><kbd className="px-1.5 py-0.5 bg-white/[0.08] text-indigo-300 rounded-md border border-white/[0.12] font-bold">J</kbd> Next</span>
                   <span>·</span>
-                  <span><kbd className="px-1.5 py-0.5 bg-slate-800 text-indigo-300 rounded border border-slate-700 font-bold">K</kbd> Prev</span>
+                  <span><kbd className="px-1.5 py-0.5 bg-white/[0.08] text-indigo-300 rounded-md border border-white/[0.12] font-bold">K</kbd> Prev</span>
                   <span>·</span>
-                  <span><kbd className="px-1.5 py-0.5 bg-slate-800 text-emerald-400 rounded border border-slate-700 font-bold">A</kbd> Accept</span>
+                  <span><kbd className="px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 rounded-md border border-emerald-500/30 font-bold">A</kbd> Accept</span>
                   <span>·</span>
-                  <span><kbd className="px-1.5 py-0.5 bg-slate-800 text-rose-400 rounded border border-slate-700 font-bold">D</kbd> Dismiss</span>
+                  <span><kbd className="px-1.5 py-0.5 bg-rose-500/20 text-rose-300 rounded-md border border-rose-500/30 font-bold">D</kbd> Dismiss</span>
                 </span>
               </div>
             )}
@@ -518,15 +520,17 @@ export const ContentNew: React.FC = () => {
             {/* Finding Cards Stack */}
             <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
               {findings.length === 0 ? (
-                <div className="p-8 text-center rounded-lg border border-dashed border-slate-800 bg-slate-950/40">
-                  <Sparkles className="w-8 h-8 text-indigo-400/50 mx-auto mb-2" />
-                  <p className="text-xs font-medium text-slate-300">Ready to Audit</p>
-                  <p className="text-[11px] text-slate-500 mt-1 max-w-xs mx-auto">
-                    Click <strong>"Run Brand Pre-Check"</strong> to run deterministic and AI governance rules on your draft copy.
+                <div className="p-10 text-center rounded-2xl border border-dashed border-indigo-500/20 bg-gradient-to-b from-indigo-950/20 to-transparent">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-500/20 to-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mx-auto mb-3 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
+                    <Sparkles className="w-6 h-6 animate-pulse" />
+                  </div>
+                  <p className="text-sm font-bold text-white font-['Outfit']">Ready to Audit</p>
+                  <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto leading-relaxed">
+                    Click <strong>&quot;Run Brand Pre-Check&quot;</strong> to evaluate deterministic and AI governance rules on your draft copy.
                   </p>
                 </div>
               ) : filteredFindings.length === 0 ? (
-                <div className="p-6 text-center text-xs text-slate-400">
+                <div className="p-8 text-center text-xs text-slate-400">
                   No findings in this category.
                 </div>
               ) : (
@@ -543,16 +547,16 @@ export const ContentNew: React.FC = () => {
               )}
             </div>
 
-            {/* Submission Gate (FC1.1 - Human Decision in Control) */}
+            {/* Submission Gate */}
             {findings.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-slate-800">
+              <div className="mt-4 pt-4 border-t border-white/[0.08]">
                 <button
                   onClick={handleSubmitForReview}
                   disabled={criticalCount > 0}
-                  className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition shadow-md ${
+                  className={`w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs font-bold transition-all shadow-lg ${
                     criticalCount > 0
-                      ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
-                      : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20'
+                      ? 'bg-white/[0.04] text-slate-500 cursor-not-allowed border border-white/[0.08]'
+                      : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.35)] transform hover:-translate-y-0.5'
                   }`}
                 >
                   <Send className="w-3.5 h-3.5" />
@@ -563,7 +567,7 @@ export const ContentNew: React.FC = () => {
                   </span>
                 </button>
                 {criticalCount > 0 && (
-                  <p className="text-[11px] text-rose-400 text-center mt-1.5">
+                  <p className="text-[11px] text-rose-400 text-center mt-2 font-medium">
                     Critical findings must be accepted or justified before requesting approval.
                   </p>
                 )}

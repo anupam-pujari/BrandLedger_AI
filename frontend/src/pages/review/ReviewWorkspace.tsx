@@ -172,17 +172,18 @@ export const ReviewWorkspace: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in pb-16">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
-        <div className="flex items-center gap-3">
-          <Link to="/review/queue" className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
-            <ArrowLeft className="w-4 h-4" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
+        <div className="flex items-center gap-3.5">
+          <Link to="/review/queue" className="p-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 border border-white/[0.10] hover:border-cyan-500/40 transition-all shadow-sm">
+            <ArrowLeft className="w-4 h-4 text-cyan-400" />
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2">
-              <span>Review Draft: {content?.title || 'Draft Submission'}</span>
+            <h1 className="text-2xl font-black text-white flex items-center gap-2 font-['Outfit']">
+              <span>Review Draft:</span>
+              <span className="text-gradient-vibrant">{content?.title || 'Draft Submission'}</span>
             </h1>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Author ID: {content?.author_id?.slice(0, 8)}... · Version {content?.current_version?.version_number || 1}
+            <p className="text-xs text-slate-400 mt-0.5 font-mono">
+              Author: {content?.author_id?.slice(0, 8)}... · Version {content?.current_version?.version_number || 1}
             </p>
           </div>
         </div>
@@ -191,9 +192,9 @@ export const ReviewWorkspace: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowChangesModal(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg text-xs font-semibold transition"
+            className="flex items-center gap-1.5 px-4 py-2 bg-white/[0.04] hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:border-amber-400/60 rounded-xl text-xs font-bold transition-all shadow-sm"
           >
-            <XCircle className="w-3.5 h-3.5" />
+            <XCircle className="w-3.5 h-3.5 text-amber-400" />
             <span>Request Changes</span>
           </button>
 
@@ -202,14 +203,14 @@ export const ReviewWorkspace: React.FC = () => {
             <button
               onClick={handleApprove}
               disabled={isSubmitting || content?.status === 'approved'}
-              className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-lg text-xs font-bold shadow-md shadow-emerald-600/20 transition"
+              className="flex items-center gap-1.5 px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-[0_0_20px_rgba(16,185,129,0.35)] transition-all transform hover:-translate-y-0.5"
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>{content?.status === 'approved' ? 'Approved & Certified' : 'Approve & Sign-Off'}</span>
             </button>
           ) : (
-            <div className="px-3 py-2 bg-slate-900 border border-rose-900/60 rounded-lg text-xs text-rose-300 flex items-center gap-1.5" title="Constitutional Rule FC1.3: Creator cannot approve own draft">
-              <Lock className="w-3.5 h-3.5" />
+            <div className="px-3.5 py-2 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-300 flex items-center gap-1.5 font-medium shadow-[0_0_12px_rgba(244,63,94,0.15)]" title="Constitutional Rule FC1.3: Creator cannot approve own draft">
+              <Lock className="w-3.5 h-3.5 text-rose-400" />
               <span>Self-Approval Restricted (FC1.3)</span>
             </div>
           )}
@@ -217,7 +218,7 @@ export const ReviewWorkspace: React.FC = () => {
           {content?.status === 'approved' && (
             <button
               onClick={handleDownloadPdf}
-              className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition"
+              className="btn-gradient-primary flex items-center gap-1.5 px-4 py-2 text-white rounded-xl text-xs font-bold transition-all"
               title="Download Certified Compliance Record"
             >
               <Download className="w-3.5 h-3.5" />
@@ -229,10 +230,10 @@ export const ReviewWorkspace: React.FC = () => {
 
       {/* FC1.3 Warning banner if author */}
       {isAuthor && (
-        <div className="p-3.5 rounded-xl border border-amber-900/40 bg-amber-950/20 text-xs text-amber-300 flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          <span>
-            <strong>Constitutional Safety Guard (FC1.3):</strong> You authored this draft. The "Approve" button is hidden to ensure impartial review. Switch persona in the top-right to <strong>Elena Rostova (Reviewer)</strong> or <strong>Sarah Lin (Brand Manager)</strong> to approve.
+        <div className="p-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-xs text-amber-300 flex items-center gap-2.5 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
+          <AlertCircle className="w-4 h-4 shrink-0 text-amber-400" />
+          <span className="leading-relaxed">
+            <strong>Constitutional Safety Guard (FC1.3):</strong> You authored this draft. The &quot;Approve&quot; button is hidden to ensure impartial review. Switch persona in the top-right to <strong>Elena Rostova (Reviewer)</strong> or <strong>Sarah Lin (Brand Manager)</strong> to approve.
           </span>
         </div>
       )}
@@ -241,12 +242,17 @@ export const ReviewWorkspace: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column (7 cols): Submitted Document Text */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden shadow-sm">
-            <div className="px-4 py-3 bg-slate-950 border-b border-slate-800 flex items-center justify-between text-xs">
-              <span className="font-semibold text-white">Current Version Text (v{content?.current_version?.version_number || 1})</span>
-              <span className="text-slate-400 capitalize">{content?.content_type} format</span>
+          <div className="rounded-2xl border border-white/[0.08] glass-panel overflow-hidden shadow-2xl">
+            <div className="px-5 py-3.5 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between text-xs font-['Outfit']">
+              <span className="font-bold text-white flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-cyan-400" />
+                Current Version Text (v{content?.current_version?.version_number || 1})
+              </span>
+              <span className="text-cyan-400/80 uppercase font-mono text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20">
+                {content?.content_type} format
+              </span>
             </div>
-            <div className="p-5 font-mono text-sm leading-relaxed text-slate-200 whitespace-pre-wrap bg-slate-900/90">
+            <div className="p-6 font-mono text-sm leading-relaxed text-slate-100 whitespace-pre-wrap bg-[#060814]/70">
               {content?.current_version?.body || 'No text content available.'}
             </div>
           </div>
