@@ -31,7 +31,7 @@ export const rulesApi = {
     formData.append('file', file);
     const token = apiClient.getToken();
     
-    const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/v1/rules/compile`, {
+    const response = await fetch(`${apiClient.getBaseUrl()}/api/v1/rules/compile`, {
       method: 'POST',
       headers: {
         ...(token ? { Authorization: `Bearer ${token}` } : {})

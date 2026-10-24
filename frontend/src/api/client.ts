@@ -1,7 +1,16 @@
 // src/api/client.ts
 // BrandProof Unified API Network Client
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+export const getApiBaseUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    const override = localStorage.getItem('brandproof_api_url');
+    if (override && override.trim()) {
+      return override.trim().replace(/\/$/, '');
+    }
+  }
+  return (import.meta.env.VITE_API_URL || 'http://localhost:8080').replace(/\/$/, '');
+};
+
 const API_PREFIX = '/api/v1';
 
 export interface ApiResponse<T> {
@@ -22,6 +31,18 @@ class ApiClient {
     this.token = localStorage.getItem('brandproof_token');
   }
 
+  getBaseUrl(): string {
+    return getApiBaseUrl();
+  }
+
+  setApiUrl(url: string | null) {
+    if (url && url.trim()) {
+      localStorage.setItem('brandproof_api_url', url.trim().replace(/\/$/, ''));
+    } else {
+      localStorage.removeItem('brandproof_api_url');
+    }
+  }
+
   setToken(token: string | null) {
     this.token = token;
     if (token) {
@@ -36,9 +57,10 @@ class ApiClient {
   }
 
   async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    const baseUrl = this.getBaseUrl();
     const url = endpoint.startsWith('http') 
       ? endpoint 
-      : `${BASE_URL}${endpoint.startsWith('/api') ? '' : API_PREFIX}${endpoint}`;
+      : `${baseUrl}${endpoint.startsWith('/api') ? '' : API_PREFIX}${endpoint}`;
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
