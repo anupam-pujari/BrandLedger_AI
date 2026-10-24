@@ -143,7 +143,7 @@ export const Header: React.FC = () => {
 
   const handleResetApiUrl = () => {
     apiClient.setApiUrl(null);
-    const defaultUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8080').replace(/\/$/, '');
+    const defaultUrl = getApiBaseUrl();
     setApiUrlInput(defaultUrl);
     checkBackendHealth(defaultUrl);
     showToast('Reset to default API URL', 'info');
@@ -476,12 +476,12 @@ export const Header: React.FC = () => {
                 type="url"
                 value={apiUrlInput}
                 onChange={e => setApiUrlInput(e.target.value)}
-                placeholder="https://your-backend.vercel.app"
+                placeholder="https://brand-ledger-ai-hlsl.vercel.app"
                 className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-sky-500"
               />
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5">
-              Paste your deployed Vercel backend URL (e.g. <code className="text-sky-600 dark:text-cyan-400">https://your-backend.vercel.app</code>) or keep <code className="text-slate-700 dark:text-slate-300">http://localhost:8080</code> for local dev.
+              Production backend defaults to <code className="text-sky-600 dark:text-cyan-400 font-mono">https://brand-ledger-ai-hlsl.vercel.app</code>. Local dev defaults to <code className="text-slate-700 dark:text-slate-300 font-mono">http://localhost:8080</code>.
             </p>
           </div>
 

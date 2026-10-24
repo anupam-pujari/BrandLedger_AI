@@ -1,13 +1,25 @@
 // src/api/client.ts
 // BrandProof Unified API Network Client
 
+export const DEFAULT_PRODUCTION_API_URL = 'https://brand-ledger-ai-hlsl.vercel.app';
+
 export const getApiBaseUrl = (): string => {
   if (typeof window !== 'undefined') {
     const override = localStorage.getItem('brandproof_api_url');
     if (override && override.trim()) {
       return override.trim().replace(/\/$/, '');
     }
+
+    const isLocalhost =
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === '0.0.0.0';
+
+    if (!isLocalhost) {
+      return (import.meta.env.VITE_API_URL || DEFAULT_PRODUCTION_API_URL).replace(/\/$/, '');
+    }
   }
+
   return (import.meta.env.VITE_API_URL || 'http://localhost:8080').replace(/\/$/, '');
 };
 
