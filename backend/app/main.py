@@ -11,6 +11,14 @@ Configures:
       * Rule Health & Insights (/api/v1/insights, /api/v1/notifications)
 """
 
+import sys
+from pathlib import Path
+
+# Ensure backend directory is in sys.path for serverless runtimes
+_backend_dir = str(Path(__file__).resolve().parent.parent)
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
