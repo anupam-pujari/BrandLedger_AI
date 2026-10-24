@@ -35,11 +35,11 @@ pip install -r requirements.txt
 ### 3. Launch Development Server
 
 ```bash
-uvicorn app.main:app --reload --port 8000
+uvicorn app.main:app --reload --port 8080
 ```
 
-- **Interactive API Documentation:** [http://localhost:8000/docs](http://localhost:8000/docs)
-- **Health Check:** [http://localhost:8000/health](http://localhost:8000/health)
+- **Interactive API Documentation:** [http://localhost:8080/docs](http://localhost:8080/docs)
+- **Health Check:** [http://localhost:8080/health](http://localhost:8080/health)
 
 ---
 
