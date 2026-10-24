@@ -69,7 +69,7 @@ export const FindingCard: React.FC<FindingCardProps> = ({
           <div className="flex items-center gap-2">
             <SeverityBadge severity={finding.severity} />
             <OriginBadge checkType={finding.check_type} />
-            {finding.proof.claim_status && (
+            {finding.proof?.claim_status && (
               <PassportPill
                 status={finding.proof.claim_status}
                 expiryDate={finding.proof.matched_fact_expiry}
@@ -77,7 +77,7 @@ export const FindingCard: React.FC<FindingCardProps> = ({
             )}
           </div>
           <span className="text-xs font-mono text-slate-400">
-            {finding.proof.rule_code || finding.proof.fact_code || finding.category.toUpperCase()}
+            {finding.proof?.rule_code || (finding as any).rule_code || finding.proof?.fact_code || (finding as any).fact_code || finding.category.toUpperCase()}
           </span>
         </div>
 
@@ -92,17 +92,17 @@ export const FindingCard: React.FC<FindingCardProps> = ({
         </div>
 
         {/* Proof citation box (FC2.1) */}
-        {(finding.proof.source_document || finding.proof.source_quote) && (
+        {(finding.proof?.source_document || finding.proof?.source_quote || (finding as any).evidence_quote) && (
           <div className="mb-3 p-2.5 rounded-lg bg-indigo-950/20 border border-indigo-900/40 text-xs">
             <div className="flex items-center gap-1.5 text-indigo-400 font-semibold mb-1">
               <FileText className="w-3.5 h-3.5" />
               <span>
-                PROOF: {finding.proof.source_document || 'Brand Guidelines'}
-                {finding.proof.source_page ? ` (Page ${finding.proof.source_page})` : ''}
+                PROOF: {finding.proof?.source_document || 'Brand Guidelines'}
+                {finding.proof?.source_page ? ` (Page ${finding.proof.source_page})` : ''}
               </span>
             </div>
-            {finding.proof.source_quote && (
-              <p className="text-slate-300 italic">"{finding.proof.source_quote}"</p>
+            {(finding.proof?.source_quote || (finding as any).evidence_quote) && (
+              <p className="text-slate-300 italic">"{finding.proof?.source_quote || (finding as any).evidence_quote}"</p>
             )}
           </div>
         )}

@@ -24,12 +24,20 @@ export const contentApi = {
     intent_purpose?: string;
     intent_audience?: string;
     intent_key_message?: string;
+    rules_only_mode?: boolean;
   }): Promise<ContentItem> {
     const res = await apiClient.post<{ content_item: ContentItem }>('/content', payload);
     return res.content_item || (res as any);
   },
 
-  async updateContent(id: string, payload: { body: string }): Promise<any> {
+  async updateContent(id: string, payload: {
+    title?: string;
+    body?: string;
+    intent_purpose?: string;
+    intent_audience?: string;
+    intent_key_message?: string;
+    rules_only_mode?: boolean;
+  }): Promise<any> {
     return apiClient.put(`/content/${id}`, payload);
   },
 

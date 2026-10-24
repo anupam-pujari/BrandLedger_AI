@@ -9,6 +9,7 @@ Replaces redundant repository abstractions with direct, testable operations.
 """
 
 from datetime import datetime, timezone
+import difflib
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -96,6 +97,46 @@ class DataStore:
                 "is_active": True,
                 "created_at": datetime.now(timezone.utc).isoformat(),
             },
+            "00000000-0000-0000-0000-000000000002": {
+                "id": "00000000-0000-0000-0000-000000000002",
+                "org_id": "00000000-0000-0000-0000-000000000001",
+                "email": "sarah.lin@apexcloud.io",
+                "display_name": "Sarah Lin",
+                "role": "brand_manager",
+                "avatar_url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256",
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            },
+            "00000000-0000-0000-0000-000000000003": {
+                "id": "00000000-0000-0000-0000-000000000003",
+                "org_id": "00000000-0000-0000-0000-000000000001",
+                "email": "marcus.vance@apexcloud.io",
+                "display_name": "Marcus Vance",
+                "role": "creator",
+                "avatar_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=256",
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            },
+            "00000000-0000-0000-0000-000000000004": {
+                "id": "00000000-0000-0000-0000-000000000004",
+                "org_id": "00000000-0000-0000-0000-000000000001",
+                "email": "elena.rostova@apexcloud.io",
+                "display_name": "Elena Rostova",
+                "role": "reviewer",
+                "avatar_url": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=256",
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            },
+            "00000000-0000-0000-0000-000000000005": {
+                "id": "00000000-0000-0000-0000-000000000005",
+                "org_id": "00000000-0000-0000-0000-000000000001",
+                "email": "david.zhang@apexcloud.io",
+                "display_name": "David Zhang",
+                "role": "admin",
+                "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=256",
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            },
         }
 
         self.rules: Dict[str, Dict[str, Any]] = {}
@@ -177,13 +218,14 @@ class DataStore:
                     for idx, d in enumerate(drafts):
                         cid = d.get("id") or f"draft-{idx+1:02d}"
                         vid = f"ver-{cid}-1"
+                        creator_id = "00000000-0000-0000-0000-000000000002"
                         self.content_items[cid] = {
                             "id": cid,
                             "org_id": org_id,
                             "title": d.get("title", f"Sample Draft {idx+1}"),
                             "content_type": d.get("content_type", "text"),
                             "status": "draft",
-                            "author_id": "usr-01",
+                            "author_id": creator_id,
                             "current_version": 1,
                             "intent_purpose": d.get("intent", {}).get("purpose", "Brand awareness"),
                             "intent_audience": d.get("intent", {}).get("audience", "Cloud Architects & IT Leaders"),
@@ -198,7 +240,7 @@ class DataStore:
                             "content_item_id": cid,
                             "version_number": 1,
                             "body": d.get("body", ""),
-                            "created_by": "usr-01",
+                            "created_by": creator_id,
                             "created_at": datetime.now(timezone.utc).isoformat(),
                             "metadata": {},
                         }
@@ -282,17 +324,21 @@ class DataStore:
 
     def create_fact(self, org_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         fact_id = f"fact-{uuid.uuid4().hex[:8]}"
+        text = data.get("content") or data.get("claim_text", "")
         fact = {
             "id": fact_id,
             "org_id": org_id,
             "fact_code": data.get("fact_code") or f"F-{len(self.facts)+1:02d}",
-            "claim_text": data.get("claim_text", ""),
+            "claim_text": text,
+            "content": text,
             "supporting_quote": data.get("supporting_quote"),
             "source_document": data.get("source_document"),
             "owner_name": data.get("owner_name", "Fact Owner"),
             "owner_email": data.get("owner_email"),
             "valid_from": data.get("valid_from"),
             "valid_until": data.get("valid_until"),
+            "status": data.get("status", "active"),
+            "tags": data.get("tags") or [],
             "is_expired": False,
             "created_at": datetime.now(timezone.utc).isoformat(),
             "updated_at": datetime.now(timezone.utc).isoformat(),
@@ -324,14 +370,19 @@ class DataStore:
 
     def create_term(self, org_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
         term_id = f"term-{uuid.uuid4().hex[:8]}"
+        pref = data.get("preferred_replacement") or data.get("replacement")
+        notes = data.get("notes") or data.get("reason")
         term = {
             "id": term_id,
             "org_id": org_id,
             "term": data.get("term", ""),
             "term_type": data.get("term_type", "banned"),
-            "preferred_replacement": data.get("preferred_replacement"),
+            "preferred_replacement": pref,
+            "replacement": pref,
             "case_sensitive": data.get("case_sensitive", False),
-            "notes": data.get("notes"),
+            "whole_word": data.get("whole_word", True),
+            "notes": notes,
+            "reason": notes,
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
         self.terms[term_id] = term
@@ -361,6 +412,7 @@ class DataStore:
             "name": data.get("name", "Asset"),
             "asset_type": data.get("asset_type", "image"),
             "file_url": data.get("file_url"),
+            "thumbnail_url": data.get("thumbnail_url"),
             "metadata": data.get("metadata", {}),
             "usage_notes": data.get("usage_notes"),
             "created_at": datetime.now(timezone.utc).isoformat(),
@@ -382,8 +434,11 @@ class DataStore:
         results = [c for c in self.content_items.values() if c.get("org_id") == org_id]
         if status and status != "all":
             results = [c for c in results if c.get("status") == status]
-        if author_id:
-            results = [c for c in results if c.get("author_id") == author_id]
+        if author_id and author_id != "all":
+            creator_ids = {author_id}
+            if author_id in ["00000000-0000-0000-0000-000000000002", "usr-01"]:
+                creator_ids.update(["00000000-0000-0000-0000-000000000002", "usr-01"])
+            results = [c for c in results if c.get("author_id") in creator_ids]
 
         # Attach latest version and findings count
         for c in results:
@@ -449,6 +504,15 @@ class DataStore:
         new_version_id = f"ver-{content_id}-{new_version_num}"
         now = datetime.now(timezone.utc).isoformat()
 
+        prev_ver = self.get_version(content_id, item["current_version"])
+        prev_body = prev_ver.get("body", "") if prev_ver else ""
+        diff_str = "".join(difflib.unified_diff(
+            prev_body.splitlines(keepends=True),
+            body.splitlines(keepends=True),
+            fromfile=f"v{item['current_version']}",
+            tofile=f"v{new_version_num}"
+        )) or "Updated content"
+
         version = {
             "id": new_version_id,
             "content_item_id": content_id,
@@ -457,6 +521,7 @@ class DataStore:
             "created_by": author_id,
             "created_at": now,
             "metadata": {},
+            "diff_from_previous": diff_str,
         }
         self.content_versions[new_version_id] = version
         item["current_version"] = new_version_num
@@ -634,7 +699,15 @@ class DataStore:
     def get_org_settings(self, org_id: str) -> Dict[str, Any]:
         org = self.organisations.get(org_id)
         if not org:
-            raise EntityNotFoundError(f"Organization '{org_id}' not found.")
+            return {
+                "rules_only_mode": False,
+                "ai_provider": "openai",
+                "masking_config": {
+                    "mask_emails": True,
+                    "mask_phones": True,
+                    "mask_confidential": True,
+                },
+            }
         return org.get("settings", {})
 
     def update_org_settings(self, org_id: str, updates: Dict[str, Any]) -> Dict[str, Any]:

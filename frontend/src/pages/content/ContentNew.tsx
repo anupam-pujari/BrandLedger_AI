@@ -102,11 +102,15 @@ export const ContentNew: React.FC = () => {
           intent_purpose: purpose,
           intent_audience: audience,
           intent_key_message: keyMessage,
+          rules_only_mode: rulesOnlyMode,
         });
         contentId = created.id;
         setCreatedContentId(contentId);
       } else {
-        await contentApi.updateContent(contentId, { body });
+        await contentApi.updateContent(contentId, {
+          body,
+          rules_only_mode: rulesOnlyMode,
+        });
       }
 
       // 2. Trigger review engine
@@ -215,7 +219,7 @@ export const ContentNew: React.FC = () => {
   };
 
   // Accept Fix (FC1.1 - In-place text replacement)
-  const handleAcceptFix = (findingId: string, fixText: string) => {
+  const handleAcceptFix = async (findingId: string, fixText: string) => {
     const finding = findings.find(f => f.id === findingId);
     if (!finding) return;
 
@@ -225,14 +229,28 @@ export const ContentNew: React.FC = () => {
     setFindings(prev =>
       prev.map(f => (f.id === findingId ? { ...f, status: 'accepted' as const, suggested_fix: fixText } : f))
     );
+    if (createdContentId && !findingId.startsWith('f-')) {
+      try {
+        await contentApi.resolveFinding(createdContentId, findingId, 'accepted', undefined, fixText);
+      } catch (err) {
+        console.warn('Backend finding resolve fallback:', err);
+      }
+    }
     showToast(`Applied revision: "${fixText}"`, 'success');
   };
 
   // Dismiss Finding
-  const handleDismissFinding = (findingId: string, reason?: string) => {
+  const handleDismissFinding = async (findingId: string, reason?: string) => {
     setFindings(prev =>
       prev.map(f => (f.id === findingId ? { ...f, status: 'dismissed' as const, dismiss_reason: reason } : f))
     );
+    if (createdContentId && !findingId.startsWith('f-')) {
+      try {
+        await contentApi.resolveFinding(createdContentId, findingId, 'dismissed', reason);
+      } catch (err) {
+        console.warn('Backend finding dismiss fallback:', err);
+      }
+    }
     showToast('Finding dismissed and logged to Rule Health', 'info');
   };
 

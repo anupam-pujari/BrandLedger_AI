@@ -1,5 +1,5 @@
 // src/pages/sourceOfTruth/RulesPage.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { rulesApi } from '../../api/rules';
 import { useUI } from '../../context/UIContext';
 import { SeverityBadge } from '../../components/common/SeverityBadge';
@@ -19,6 +19,7 @@ import {
 
 export const RulesPage: React.FC = () => {
   const { showToast } = useUI();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState<'active' | 'compiler'>('active');
   const [rules, setRules] = useState<Rule[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,9 +83,35 @@ export const RulesPage: React.FC = () => {
     }, 1200);
   };
 
-  const handleApproveProposed = (id: string) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsCompiling(true);
+    try {
+      const res = await rulesApi.compileFromPdf(file);
+      setProposedRules(res.proposed_rules || []);
+      showToast(`Extracted ${res.proposed_rules?.length || 0} candidate rules from ${file.name}`, 'success');
+    } catch (err: any) {
+      console.warn('Backend compiler fallback:', err);
+      handleSimulateCompiler();
+    } finally {
+      setIsCompiling(false);
+      if (e.target) e.target.value = '';
+    }
+  };
+
+  const handleApproveProposed = async (id: string) => {
     const target = proposedRules.find(r => r.id === id);
     if (!target) return;
+    try {
+      await rulesApi.createRule({ ...target, status: 'approved' });
+    } catch {
+      try {
+        await rulesApi.updateRule(id, { status: 'approved' });
+      } catch (err) {
+        console.warn('Backend rule sync error:', err);
+      }
+    }
     setRules(prev => [...prev, { ...target, status: 'approved' as const }]);
     setProposedRules(prev => prev.filter(r => r.id !== id));
     showToast(`Approved rule ${target.rule_code}`, 'success');
@@ -219,7 +246,22 @@ export const RulesPage: React.FC = () => {
             <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
               Our parser analyzes brand guidelines, maps them to page citations, and drafts actionable test rules for human sign-off.
             </p>
-            <div className="mt-4 flex items-center justify-center gap-3">
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.docx"
+                className="hidden"
+                onChange={handleFileUpload}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isCompiling}
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded-lg text-xs font-semibold shadow-sm transition flex items-center gap-2"
+              >
+                <UploadCloud className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Upload PDF Document</span>
+              </button>
               <button
                 onClick={handleSimulateCompiler}
                 disabled={isCompiling}

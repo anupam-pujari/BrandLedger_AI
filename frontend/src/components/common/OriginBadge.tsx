@@ -3,12 +3,12 @@ import React from 'react';
 import { Code2, Sparkles } from 'lucide-react';
 
 interface OriginBadgeProps {
-  checkType: 'rule' | 'ai';
+  checkType: 'rule' | 'ai' | 'rule_check' | 'ai_assisted' | string;
   className?: string;
 }
 
 export const OriginBadge: React.FC<OriginBadgeProps> = ({ checkType, className = '' }) => {
-  if (checkType === 'rule') {
+  if (checkType === 'rule' || checkType === 'rule_check') {
     return (
       <span
         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-medium bg-purple-950/70 text-purple-300 border border-purple-800/60 ${className}`}

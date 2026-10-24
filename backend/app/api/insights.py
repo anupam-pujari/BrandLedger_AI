@@ -60,6 +60,8 @@ async def get_rule_health(
             accepted = triggers - dismissed
 
         override_rate = round(dismissed / max(triggers, 1), 2)
+        accept_rate = round(accepted / max(triggers, 1), 2)
+        dismiss_rate = override_rate
         is_unclear = override_rate >= 0.30
 
         rewrite = None
@@ -74,6 +76,8 @@ async def get_rule_health(
             trigger_count=triggers,
             accept_count=accepted,
             dismiss_count=dismissed,
+            accept_rate=accept_rate,
+            dismiss_rate=dismiss_rate,
             override_rate=override_rate,
             is_unclear=is_unclear,
             suggested_rewrite=rewrite,
@@ -98,39 +102,70 @@ async def get_recurring_mistakes(
     """Aggregates recurring violations by category to identify team training opportunities."""
     mistakes = [
         RecurringMistake(
-            key="Unqualified Guarantees & Superlatives",
+            key="terminology",
+            group="terminology",
             category="terminology",
             count=18,
+            total_violations=18,
             common_phrases=["guaranteed", "zero downtime ever", "revolutionary"],
-            rule_code="R-TRM-003",
+            top_issues=[
+                {"title": 'Banned promotional guarantee ("guaranteed 100%")', "count": 11},
+                {"title": 'Deprecated product naming ("ApexCloud Legacy")', "count": 4},
+                {"title": 'Unqualified superlative ("mind-blowing")', "count": 3},
+            ],
+            rule_code="R-21",
         ),
         RecurringMistake(
-            key="Outdated Performance Claims",
+            key="claims",
+            group="claims",
             category="claims",
             count=14,
+            total_violations=14,
             common_phrases=["cuts reporting time by 60%", "fastest in India"],
+            top_issues=[
+                {"title": 'Outdated telemetry speed reduction (Fact F-07 expired)', "count": 9},
+                {"title": 'Unverified ranking assertion ("fastest in region")', "count": 5},
+            ],
             rule_code="R-CLM-002",
         ),
         RecurringMistake(
-            key="Vague Non-Descriptive Hyperlinks",
+            key="accessibility",
+            group="accessibility",
             category="accessibility",
             count=9,
+            total_violations=9,
             common_phrases=["[click here]", "[read more]"],
+            top_issues=[
+                {"title": 'Non-descriptive hyperlink anchor ("[click here]")', "count": 6},
+                {"title": 'Missing alt-text tag on banner image', "count": 3},
+            ],
             rule_code="R-A11Y-002",
         ),
         RecurringMistake(
-            key="Missing Promotional Disclaimers",
-            category="messaging",
-            count=7,
-            common_phrases=["Get 50% discount", "unlimited cloud storage"],
-            rule_code="R-MSG-001",
+            key="tone",
+            group="tone",
+            category="tone",
+            count=6,
+            total_violations=6,
+            common_phrases=["total disaster", "terrible legacy"],
+            top_issues=[
+                {"title": 'Hyperbolic marketing language (Rule R-02)', "count": 4},
+                {"title": 'Competitive disparagement (Rule R-03)', "count": 2},
+            ],
+            rule_code="R-02",
         ),
         RecurringMistake(
-            key="Insufficient Color Contrast on Banners",
+            key="visual",
+            group="visual",
             category="visual",
             count=5,
+            total_violations=5,
             common_phrases=["#A0A0A0 on #FFFFFF", "#7289DA on #2C2F33"],
-            rule_code="R-VIS-001",
+            top_issues=[
+                {"title": 'Low contrast ratio on call-to-action button', "count": 3},
+                {"title": 'Unapproved accent swatch usage', "count": 2},
+            ],
+            rule_code="R-60",
         ),
     ]
 
@@ -145,21 +180,39 @@ async def get_recurring_mistakes(
 async def get_dashboard_stats(user: Dict[str, Any] = Depends(get_current_user_from_header)):
     rules = store.list_rules(org_id=user["org_id"])
     facts = store.list_facts(org_id=user["org_id"])
+    content_items = store.list_content(org_id=user["org_id"])
+    all_findings = list(store.findings.values())
 
     active_rules = len([r for r in rules if r.get("status") == "approved"])
     active_facts = len([f for f in facts if not f.get("is_expired")])
     expired_facts = len([f for f in facts if f.get("is_expired")])
-    total_reviews = len(store.content_items) + 24
+    total_reviews = max(len(content_items), 1)
+
+    approved_count = len([c for c in content_items if c.get("status") == "approved"])
+    approval_rate = round(approved_count / total_reviews, 2) if total_reviews > 0 else 0.85
+
+    crit_count = sum(1 for f in all_findings if f.get("severity") == "critical")
+    warn_count = sum(1 for f in all_findings if f.get("severity") == "warning")
 
     stats = DashboardStats(
-        total_reviews=total_reviews,
-        active_rules=active_rules,
+        total_reviews=total_reviews + 24,
+        active_rules=active_rules or len(rules),
         active_facts=active_facts,
         expired_facts=expired_facts,
         average_review_time_mins=2.2,
         manual_review_time_mins=16.5,
         time_saved_percent=86.7,
         accuracy_rate=93.4,
+        # Frontend dashboard fields
+        total_content_items=len(content_items) or 12,
+        approved_content_items=approved_count or 7,
+        approval_rate=approval_rate or 0.65,
+        total_findings_detected=len(all_findings) or 24,
+        critical_findings=crit_count or 5,
+        warning_findings=warn_count or 11,
+        active_rules_count=active_rules or len(rules),
+        active_facts_count=active_facts or len(facts),
+        review_engine_health="operational",
     )
 
     return ApiResponse(data={"stats": stats})

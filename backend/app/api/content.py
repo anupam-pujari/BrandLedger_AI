@@ -26,6 +26,7 @@ from app.schemas import (
     Finding,
     FindingReasonRequiredError,
     FindingResolveRequest,
+    InsufficientRoleError,
     InvalidTransitionError,
     SelfApprovalError,
 )
@@ -36,7 +37,13 @@ router = APIRouter(tags=["Content Review & Governance"])
 
 # ==============================================================================
 # Content Items & Versions
-# ==============================================================================
+def _serialize_content_item(item: Dict[str, Any]) -> ContentItem:
+    data = dict(item)
+    latest = data.get("latest_version")
+    if latest:
+        data["current_version"] = latest
+    return ContentItem(**data)
+
 
 @router.get("/content", response_model=ApiResponse[Dict[str, Any]])
 async def list_content(
@@ -45,7 +52,7 @@ async def list_content(
     user: Dict[str, Any] = Depends(get_current_user_from_header),
 ):
     items = store.list_content(org_id=user["org_id"], status=status, author_id=author_id)
-    return ApiResponse(data={"content_items": [ContentItem(**c) for c in items]})
+    return ApiResponse(data={"content_items": [_serialize_content_item(c) for c in items]})
 
 
 @router.post("/content", response_model=ApiResponse[Dict[str, Any]], status_code=status.HTTP_201_CREATED)
@@ -58,13 +65,13 @@ async def create_content(
         author_id=user["id"],
         data=payload.model_dump(),
     )
-    return ApiResponse(data={"content_item": ContentItem(**item)})
+    return ApiResponse(data={"content_item": _serialize_content_item(item)})
 
 
 @router.get("/content/{content_id}", response_model=ApiResponse[Dict[str, Any]])
 async def get_content(content_id: str, user: Dict[str, Any] = Depends(get_current_user_from_header)):
     item = store.get_content(org_id=user["org_id"], content_id=content_id)
-    return ApiResponse(data={"content_item": ContentItem(**item)})
+    return ApiResponse(data={"content_item": _serialize_content_item(item)})
 
 
 @router.put("/content/{content_id}", response_model=ApiResponse[Dict[str, Any]])
@@ -80,14 +87,28 @@ async def update_content(
         body=body,
         author_id=user["id"],
     )
-    return ApiResponse(data={"content_item": ContentItem(**item)})
+    if payload.rules_only_mode is not None:
+        item["rules_only_mode"] = payload.rules_only_mode
+    if payload.title:
+        item["title"] = payload.title
+    if payload.intent_purpose:
+        item["intent_purpose"] = payload.intent_purpose
+    if payload.intent_audience:
+        item["intent_audience"] = payload.intent_audience
+    if payload.intent_key_message:
+        item["intent_key_message"] = payload.intent_key_message
+
+    return ApiResponse(data={
+        "content_item": _serialize_content_item(item),
+        "version": item.get("latest_version"),
+    })
 
 
 # ==============================================================================
 # Review Engine Execution (planing.txt Section 4, Stage 3)
 # ==============================================================================
 
-@router.post("/content/{content_id}/check", response_model=ApiResponse[Dict[str, Any]])
+@router.post("/content/{content_id}/check", response_model=ApiResponse[Dict[str, Any]], status_code=status.HTTP_202_ACCEPTED)
 async def trigger_review_check(
     content_id: str,
     user: Dict[str, Any] = Depends(get_current_user_from_header),
@@ -123,6 +144,7 @@ async def trigger_review_check(
 
     content_item["status"] = "checked"
     content_item["findings_count"] = review_result["findings_count"]
+    review_result["status"] = "checked"
 
     return ApiResponse(data=review_result)
 
@@ -178,7 +200,7 @@ async def resolve_finding(
 @router.post("/content/{content_id}/submit-for-review", response_model=ApiResponse[Dict[str, Any]])
 async def submit_for_review(content_id: str, user: Dict[str, Any] = Depends(get_current_user_from_header)):
     item = store.submit_for_review(org_id=user["org_id"], content_id=content_id, user_id=user["id"])
-    return ApiResponse(data={"content_item": ContentItem(**item)})
+    return ApiResponse(data={"content_item": _serialize_content_item(item)})
 
 
 @router.post("/content/{content_id}/approve", response_model=ApiResponse[Dict[str, Any]])
@@ -187,8 +209,11 @@ async def approve_content(content_id: str, user: Dict[str, Any] = Depends(get_cu
     Brand Manager final approval.
     Enforces governance rule: No author can approve their own content (planing.txt Line 84).
     """
+    if user.get("role") not in ["brand_manager", "admin"]:
+        raise InsufficientRoleError("Action requires brand_manager or admin role.")
+
     item = store.approve_content(org_id=user["org_id"], content_id=content_id, user_id=user["id"])
-    return ApiResponse(data={"content_item": ContentItem(**item)})
+    return ApiResponse(data={"content_item": _serialize_content_item(item)})
 
 
 @router.post("/content/{content_id}/request-changes", response_model=ApiResponse[Dict[str, Any]])
@@ -199,7 +224,7 @@ async def request_changes(
 ):
     notes = payload.get("notes", "")
     item = store.request_changes(org_id=user["org_id"], content_id=content_id, notes=notes, user_id=user["id"])
-    return ApiResponse(data={"content_item": ContentItem(**item)})
+    return ApiResponse(data={"content_item": _serialize_content_item(item)})
 
 
 # ==============================================================================
@@ -265,6 +290,7 @@ async def export_approval_pdf(content_id: str, user: Dict[str, Any] = Depends(ge
     findings = store.list_findings(org_id=user["org_id"], content_id=content_id)
 
     # Clean PDF bytes generation
+    vnum = item.get("current_version") if isinstance(item.get("current_version"), int) else (item.get("latest_version", {}).get("version_number", 1) if isinstance(item.get("latest_version"), dict) else 1)
     pdf_text = (
         f"%PDF-1.4\n"
         f"1 0 obj << /Title ({item['title']}) /Author ({user.get('display_name', 'BrandProof')}) >> endobj\n"
@@ -274,7 +300,7 @@ async def export_approval_pdf(content_id: str, user: Dict[str, Any] = Depends(ge
         f"5 0 obj << /Length 200 >> stream\n"
         f"BT /F1 14 Tf 50 720 Td (BRANDPROOF AUDIT & APPROVAL RECORD) Tj ET\n"
         f"BT /F1 10 Tf 50 690 Td (Document: {item['title']}) Tj ET\n"
-        f"BT /F1 10 Tf 50 670 Td (Status: {item['status'].upper()} | Version: v{item['current_version']}) Tj ET\n"
+        f"BT /F1 10 Tf 50 670 Td (Status: {item['status'].upper()} | Version: v{vnum}) Tj ET\n"
         f"BT /F1 10 Tf 50 650 Td (Governance Checks Passed: {len([f for f in findings if f.get('status') == 'accepted'])} resolved) Tj ET\n"
         f"endstream\nendobj\nxref\n0 6\n0000000000 65535 f \n"
         f"trailer << /Size 6 /Root 2 0 R >>\nstartxref\n500\n%%EOF"

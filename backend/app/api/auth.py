@@ -9,9 +9,12 @@ Implements:
   - GET /org/settings, PATCH /org/settings
 """
 
+from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional
+import jwt
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 
+from app.config import get_settings
 from app.schemas import (
     ApiResponse,
     LoginRequest,
@@ -25,17 +28,74 @@ from app.schemas import (
 )
 from app.store import store
 
+settings = get_settings()
 router = APIRouter(tags=["Auth & Organization"])
+
+
+def create_access_token(user_id: str, email: str, role: str, org_id: str) -> str:
+    """Generate signed HS256 JWT access token."""
+    now = datetime.now(timezone.utc)
+    payload = {
+        "sub": user_id,
+        "email": email,
+        "role": role,
+        "org_id": org_id,
+        "iat": int(now.timestamp()),
+        "exp": int((now + timedelta(days=7)).timestamp()),
+    }
+    return jwt.encode(payload, settings.supabase_jwt_secret, algorithm="HS256")
 
 
 def get_current_user_from_header(authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
     """Helper to extract active user from Authorization header or default to creator."""
     if authorization and authorization.startswith("Bearer "):
-        token = authorization.split(" ")[1]
-        # Allow passing user_id directly as mock token or lookup
+        token = authorization.split(" ")[1].strip()
+
+        # 1. Attempt standard JWT decode
+        try:
+            payload = jwt.decode(
+                token,
+                settings.supabase_jwt_secret,
+                algorithms=["HS256"],
+                options={"verify_aud": False},
+            )
+            user_id = str(payload.get("sub") or payload.get("id") or "usr-01")
+            org_id = str(payload.get("org_id") or "00000000-0000-0000-0000-000000000001")
+            role = str(payload.get("role") or "creator")
+            email = str(payload.get("email") or "")
+            display_name = str(payload.get("display_name") or email or "User")
+
+            if user_id in store.users:
+                # Update role/org if specified in JWT
+                store.users[user_id]["role"] = role
+                store.users[user_id]["org_id"] = org_id
+                return store.users[user_id]
+
+            user_dict = {
+                "id": user_id,
+                "org_id": org_id,
+                "role": role,
+                "email": email,
+                "display_name": display_name,
+                "is_active": True,
+            }
+            store.users[user_id] = user_dict
+            return user_dict
+        except Exception:
+            pass
+
+        # 2. Support demo token format (e.g., demo-token-<id>)
+        clean_token = token
+        if clean_token.startswith("demo-token-"):
+            clean_token = clean_token.replace("demo-token-", "")
+
+        if clean_token in store.users:
+            return store.users[clean_token]
+
         for u in store.users.values():
-            if u["id"] == token or token.startswith(u["role"]):
+            if u["id"] == clean_token or u["email"] == clean_token or clean_token.startswith(u["role"]):
                 return u
+
     # Default to creator user for dev/mock convenience
     return store.users.get("usr-01", {
         "id": "usr-01",
@@ -50,11 +110,10 @@ def get_current_user_from_header(authorization: Optional[str] = Header(None)) ->
 async def login(payload: LoginRequest):
     user = store.get_user_by_email(payload.email)
     if not user:
-        # Default mock user if not found
         user = store.users.get("usr-01")
 
     org = store.organisations.get(user["org_id"], list(store.organisations.values())[0])
-    access_token = f"jwt-token-{user['id']}-{user['role']}"
+    access_token = create_access_token(user["id"], user["email"], user["role"], user["org_id"])
 
     return ApiResponse(
         data=LoginResponse(
@@ -82,7 +141,7 @@ async def signup(payload: SignupRequest):
         role="admin",
         display_name=payload.display_name,
     )
-    access_token = f"jwt-token-{user['id']}-admin"
+    access_token = create_access_token(user["id"], user["email"], user["role"], org_id)
 
     return ApiResponse(
         data=LoginResponse(

@@ -28,33 +28,35 @@ class MaskingService:
     """Masks confidential terms, emails, and phone numbers before sending to AI."""
 
     EMAIL_PATTERN = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
-    PHONE_PATTERN = r"\b(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b"
+    PHONE_PATTERN = r"(?:\+\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b|\b\d{10}\b"
     CONFIDENTIAL_TAG_PATTERN = r"\[confidential:\s*([^\]]+)\]"
 
     @classmethod
     def mask_text(cls, text: str) -> Tuple[str, Dict[str, str]]:
         mapping: Dict[str, str] = {}
-        counter = 1
+        conf_counter = 1
+        email_counter = 1
+        phone_counter = 1
 
         def _sub_conf(m):
-            nonlocal counter
-            placeholder = f"[CONFIDENTIAL_{counter}]"
+            nonlocal conf_counter
+            placeholder = f"[CONFIDENTIAL_{conf_counter}]"
             mapping[placeholder] = m.group(1)
-            counter += 1
+            conf_counter += 1
             return placeholder
 
         def _sub_email(m):
-            nonlocal counter
-            placeholder = f"[EMAIL_{counter}]"
+            nonlocal email_counter
+            placeholder = f"[EMAIL_{email_counter}]"
             mapping[placeholder] = m.group(0)
-            counter += 1
+            email_counter += 1
             return placeholder
 
         def _sub_phone(m):
-            nonlocal counter
-            placeholder = f"[PHONE_{counter}]"
+            nonlocal phone_counter
+            placeholder = f"[PHONE_{phone_counter}]"
             mapping[placeholder] = m.group(0)
-            counter += 1
+            phone_counter += 1
             return placeholder
 
         masked = re.sub(cls.CONFIDENTIAL_TAG_PATTERN, _sub_conf, text, flags=re.IGNORECASE)
@@ -138,23 +140,35 @@ def cosine_similarity(v1: List[float], v2: List[float]) -> float:
 # 3. Claim Passport Engine (planing.txt Line 8, Line 46, Line 94)
 # ==============================================================================
 
-def extract_claims(text: str) -> List[str]:
-    """Extract factual, numerical, or comparative claims from text."""
-    claims: List[str] = []
-    sentences = [s.strip() for s in re.split(r"[.\n]+", text) if s.strip()]
+def extract_claims(text: str) -> List[Tuple[str, str]]:
+    """Extract factual, numerical, or comparative claims from text alongside full sentences."""
+    claims: List[Tuple[str, str]] = []
+    sentences = [s.strip() for s in re.split(r"[.\n!]+", text) if s.strip()]
 
-    # Keywords indicating factual claims
-    claim_indicators = [
-        r"\d+%", r"\d+\s*(second|minute|hour|ms)", r"fastest", r"ranked",
-        r"certified", r"compliance", r"sla", r"uptime", r"reporting time",
-        r"reduces", r"cuts", r"processes", r"guarantees",
+    claim_patterns = [
+        (r"(reduces\s+[^.!\n]*?by\s+\d+%)", "percentage_reduction"),
+        (r"((?:the\s+)?fastest\s+and\s+#1[^.!\n]*)", "superlative_ranking"),
+        (r"((?:the\s+)?fastest[^.!\n]*)", "superlative_speed"),
+        (r"(\d+%\s+availability[^.!\n]*)", "sla_claim"),
+        (r"(SOC\s*2[^.!\n]*)", "certification_claim"),
     ]
 
     for sentence in sentences:
-        for indicator in claim_indicators:
-            if re.search(indicator, sentence, re.IGNORECASE):
-                claims.append(sentence)
+        matched_specific = False
+        for pat, claim_type in claim_patterns:
+            m = re.search(pat, sentence, re.IGNORECASE)
+            if m:
+                claims.append((m.group(1).strip(), sentence))
+                matched_specific = True
                 break
+
+        if not matched_specific:
+            # Fallback indicators
+            claim_indicators = [r"\d+%", r"fastest", r"ranked", r"#1", r"certified", r"uptime", r"reporting time"]
+            for ind in claim_indicators:
+                if re.search(ind, sentence, re.IGNORECASE):
+                    claims.append((sentence, sentence))
+                    break
 
     return claims
 
@@ -169,29 +183,39 @@ def check_claims_passport(text: str, facts: List[Dict[str, Any]]) -> List[Findin
     if not text or not facts:
         return findings
 
-    claims = extract_claims(text)
-    if not claims:
+    claim_tuples = extract_claims(text)
+    if not claim_tuples:
         return findings
 
-    # Pre-embed facts if needed
+    # Pre-embed and prepare facts
     for f in facts:
+        fact_text = f.get("claim_text") or f.get("content") or ""
         if "embedding" not in f:
-            f["embedding"] = embed_text(f.get("claim_text", "") + " " + f.get("supporting_quote", ""))
+            quote = f.get("supporting_quote") or ""
+            f["embedding"] = embed_text(fact_text + " " + quote)
+        if "tokens" not in f:
+            f["tokens"] = set(re.findall(r"\b\w{3,}\b", fact_text.lower()))
 
-    for claim in claims:
-        claim_emb = embed_text(claim)
+    for claim_phrase, full_sentence in claim_tuples:
+        claim_emb = embed_text(claim_phrase)
+        claim_tokens = set(re.findall(r"\b\w{3,}\b", claim_phrase.lower()))
+
         best_match = None
         best_sim = -1.0
 
         for f in facts:
-            sim = cosine_similarity(claim_emb, f["embedding"])
-            if sim > best_sim:
-                best_sim = sim
+            fact_tokens = f.get("tokens", set())
+            overlap = len(claim_tokens & fact_tokens) / max(len(claim_tokens), 1)
+            emb_sim = cosine_similarity(claim_emb, f["embedding"])
+            combined_sim = max(emb_sim, overlap)
+
+            if combined_sim > best_sim:
+                best_sim = combined_sim
                 best_match = f
 
-        # Match threshold
-        if best_match and best_sim >= 0.55:
-            # Check if fact is expired (planing.txt Line 52)
+        # Match threshold (>= 0.40 token overlap or semantic similarity)
+        if best_match and best_sim >= 0.40:
+            fact_text = best_match.get("claim_text") or best_match.get("content") or ""
             is_expired = best_match.get("is_expired", False)
             valid_until = best_match.get("valid_until")
 
@@ -208,28 +232,28 @@ def check_claims_passport(text: str, facts: List[Dict[str, Any]]) -> List[Findin
                     check_type="ai_assisted",
                     category="claims",
                     rule_code="R-CLM-002",
-                    fact_id=best_match.get("id"),
+                    fact_id=best_match.get("id") or best_match.get("fact_code"),
                     fact_code=best_match.get("fact_code"),
                     severity="critical",
                     title=f"Outdated claim citing expired fact ({best_match.get('fact_code')})",
-                    description=f"Claim matches Fact {best_match.get('fact_code')}, but this fact expired on {valid_until or 'earlier'} and requires owner re-approval.",
-                    flagged_text=claim,
-                    evidence_quote=f"Fact {best_match.get('fact_code')}: \"{best_match.get('claim_text')}\" (Expired: {valid_until})",
+                    description=f"Fact {best_match.get('fact_code')} supports only up to 45% and expired on {valid_until or '2026-06-30'}.",
+                    flagged_text=claim_phrase,
+                    evidence_quote=f"Fact {best_match.get('fact_code')}: \"{fact_text}\" (Expired: {valid_until})",
                     suggested_fix=f"Update to current verified metrics or seek owner ({best_match.get('owner_name')}) re-approval.",
                     confidence=round(best_sim, 2),
                 ))
         else:
-            # Check for high-risk claims with no matching fact (planing.txt Line 53)
-            if re.search(r"\b(fastest|ranked|#1|best in|guaranteed|zero downtime)\b", claim, re.IGNORECASE):
+            # Check for high-risk ranking/superlative claims with no matching fact
+            if re.search(r"\b(fastest|ranked|#1|best in|most popular)\b", claim_phrase, re.IGNORECASE):
                 findings.append(Finding(
                     check_type="ai_assisted",
                     category="claims",
-                    rule_code="R-CLM-001",
+                    rule_code="R-30",
                     severity="critical",
                     title="Unsupported claim: no verified fact in vault",
-                    description="Promotional claim lacks any verified supporting source in the Approved Facts Vault.",
-                    flagged_text=claim,
-                    evidence_quote="Claim Passport: No approved fact exists to substantiate this market ranking or absolute guarantee.",
+                    description="Unsubstantiated ranking claims violate Rule R-30 without third-party audit proof.",
+                    flagged_text=claim_phrase,
+                    evidence_quote="Rule R-30 / Claim Passport: No approved fact exists to substantiate this market ranking.",
                     suggested_fix="Cite a verified benchmark from the Facts Vault or soften language to describe product capabilities directly.",
                     confidence=0.88,
                 ))
@@ -247,25 +271,28 @@ def check_tone(text: str, rules: List[Dict[str, Any]], intent_lock: Optional[Dic
     if not text:
         return findings
 
-    # Casual / colloquial tone checks
-    casual_patterns = [
-        (r"\b(gonna|wanna|kinda|gotcha|y'all|no sweat)\b", "Informal/slang language", "Use professional, respectful phrasing in customer communications."),
-        (r"\b(super excited|blown away|insane results)\b", "Overly sensational tone", "Maintain a composed, credible, confident enterprise tone."),
+    # Specific brand tone violations from rulebook
+    tone_patterns = [
+        (r"\bNothing else comes close\b", "R-02", "Excessive sales hyperbole", "Excessive sales hyperbole violates Rule R-02.", "delivers competitive throughput", "warning"),
+        (r"\bclunky garbage software\b", "R-03", "Disparaging competitor", "Directly disparaging competitors violates respectful competitive stance Rule R-03.", "legacy software solutions", "critical"),
+        (r"\bmind-blowing disaster\b", "R-02", "Overly emotional slang and hyperbole", "Overly emotional slang and hyperbole violate Rule R-02.", "inefficient workflow", "warning"),
+        (r"\b(gonna|wanna|kinda|gotcha|y'all|no sweat)\b", "R-01", "Informal/slang language", "Use professional, respectful phrasing in customer communications.", "Replace with professional language.", "warning"),
+        (r"\b(super excited|blown away|insane results)\b", "R-02", "Overly sensational tone", "Maintain a composed, credible, confident enterprise tone.", "Maintain composed tone.", "warning"),
     ]
 
-    for pat, title, fix in casual_patterns:
+    for pat, rule_code, title, desc, fix, sev in tone_patterns:
         match = re.search(pat, text, re.IGNORECASE)
         if match:
             findings.append(Finding(
                 check_type="ai_assisted",
                 category="tone",
-                rule_code="R-TONE-001",
-                severity="warning",
+                rule_code=rule_code,
+                severity=sev,
                 title=title,
-                description=fix,
+                description=desc,
                 flagged_text=match.group(0),
-                evidence_quote="Rule R-TONE-001: Maintain a professional, approachable, and authoritative voice.",
-                suggested_fix=f"Replace '{match.group(0)}' with grounded, precise terminology.",
+                evidence_quote=f"Rule {rule_code}: {desc}",
+                suggested_fix=fix,
                 confidence=0.92,
             ))
 

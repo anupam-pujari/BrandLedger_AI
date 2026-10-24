@@ -105,10 +105,11 @@ export const FactsPage: React.FC = () => {
   };
 
   const filteredFacts = facts.filter(f => {
+    const textContent = f.content || (f as any).claim_text || '';
     const matchesSearch =
-      f.content.toLowerCase().includes(search.toLowerCase()) ||
-      f.fact_code.toLowerCase().includes(search.toLowerCase()) ||
-      f.owner_name.toLowerCase().includes(search.toLowerCase());
+      textContent.toLowerCase().includes(search.toLowerCase()) ||
+      (f.fact_code || '').toLowerCase().includes(search.toLowerCase()) ||
+      (f.owner_name || '').toLowerCase().includes(search.toLowerCase());
 
     const isExpired = f.is_expired || new Date(f.valid_until) < new Date();
     if (statusFilter === 'active' && isExpired) return false;
@@ -196,7 +197,7 @@ export const FactsPage: React.FC = () => {
                 </div>
 
                 <p className="text-sm font-medium text-white leading-relaxed">
-                  "{fact.content}"
+                  "{fact.content || (fact as any).claim_text}"
                 </p>
 
                 <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 pt-1">

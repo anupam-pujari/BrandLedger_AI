@@ -52,13 +52,13 @@ export const ContentDetail: React.FC = () => {
     if (!id) return;
     setIsChecking(true);
     try {
-      await contentApi.updateContent(id, { body });
+      await contentApi.updateContent(id, { body, rules_only_mode: rulesOnlyMode });
       const checkResult = await contentApi.triggerCheck(id);
       setFindings(checkResult.findings || []);
       if (checkResult.ai_disclosure) {
         setAIDisclosure({
           id: checkResult.ai_disclosure.id || 'disc-1',
-          model_name: checkResult.ai_disclosure.model_name || 'Google Gemini 2.5 Flash',
+          model_name: checkResult.ai_disclosure.model_name || (rulesOnlyMode ? 'Deterministic Rules Engine' : 'Google Gemini 2.5 Flash'),
           called_at: checkResult.ai_disclosure.called_at || new Date().toISOString(),
           latency_ms: checkResult.ai_disclosure.latency_ms || 820,
         });
@@ -71,7 +71,7 @@ export const ContentDetail: React.FC = () => {
     }
   };
 
-  const handleAcceptFix = (findingId: string, fixText: string) => {
+  const handleAcceptFix = async (findingId: string, fixText: string) => {
     const finding = findings.find(f => f.id === findingId);
     if (!finding) return;
 
@@ -81,13 +81,27 @@ export const ContentDetail: React.FC = () => {
     setFindings(prev =>
       prev.map(f => (f.id === findingId ? { ...f, status: 'accepted' as const, suggested_fix: fixText } : f))
     );
+    if (id && !findingId.startsWith('f-')) {
+      try {
+        await contentApi.resolveFinding(id, findingId, 'accepted', undefined, fixText);
+      } catch (err) {
+        console.warn('Backend resolve finding error:', err);
+      }
+    }
     showToast(`Applied revision: "${fixText}"`, 'success');
   };
 
-  const handleDismissFinding = (findingId: string, reason?: string) => {
+  const handleDismissFinding = async (findingId: string, reason?: string) => {
     setFindings(prev =>
       prev.map(f => (f.id === findingId ? { ...f, status: 'dismissed' as const, dismiss_reason: reason } : f))
     );
+    if (id && !findingId.startsWith('f-')) {
+      try {
+        await contentApi.resolveFinding(id, findingId, 'dismissed', reason);
+      } catch (err) {
+        console.warn('Backend dismiss finding error:', err);
+      }
+    }
     showToast('Finding dismissed and logged to Rule Health', 'info');
   };
 
@@ -97,8 +111,8 @@ export const ContentDetail: React.FC = () => {
       await contentApi.submitForReview(id);
       showToast('Draft submitted to Review Queue!', 'success');
       navigate('/content/mine');
-    } catch (err) {
-      showToast('Draft submitted to Review Queue!', 'success');
+    } catch (err: any) {
+      showToast(`Submission queued: ${err.message || 'Saved to review queue'}`, 'info');
       navigate('/content/mine');
     }
   };

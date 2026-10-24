@@ -128,15 +128,15 @@ export const TermsPage: React.FC = () => {
               </span>
             </div>
 
-            {t.replacement && (
+            {(t.replacement || (t as any).preferred_replacement) && (
               <div className="flex items-center gap-2 text-xs text-slate-300 font-mono">
                 <span className="text-slate-500">Suggested:</span>
-                <span className="text-emerald-300 font-semibold">{t.replacement}</span>
+                <span className="text-emerald-300 font-semibold">{t.replacement || (t as any).preferred_replacement}</span>
               </div>
             )}
 
-            {t.reason && (
-              <p className="text-xs text-slate-400 italic">"{t.reason}"</p>
+            {(t.reason || (t as any).notes) && (
+              <p className="text-xs text-slate-400 italic">"{t.reason || (t as any).notes}"</p>
             )}
           </div>
         ))}

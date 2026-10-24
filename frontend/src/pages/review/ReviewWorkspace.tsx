@@ -97,8 +97,7 @@ export const ReviewWorkspace: React.FC = () => {
       showToast('Content approved! Certified compliance record generated.', 'success');
       setContent(prev => prev ? { ...prev, status: 'approved' } : null);
     } catch (err: any) {
-      showToast(`Approved: ${err.message || 'Marked as approved'}`, 'success');
-      setContent(prev => prev ? { ...prev, status: 'approved' } : null);
+      showToast(err.message || 'Approval failed.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -119,9 +118,7 @@ export const ReviewWorkspace: React.FC = () => {
       setShowChangesModal(false);
       navigate('/review/queue');
     } catch (err: any) {
-      showToast('Changes requested and logged.', 'info');
-      setShowChangesModal(false);
-      navigate('/review/queue');
+      showToast(err.message || 'Failed to request changes.', 'error');
     } finally {
       setIsSubmitting(false);
     }
